@@ -7,9 +7,7 @@
 	<meta name="author" content="tingxueren">
 
 	
-	<meta name="description" content="买了vps后感觉总是让它在空跑很浪费资源的感觉，前期在上面安装了openvpn和ssh只
-用来翻墙，看到负载常常是0.00真的很郁闷。将github.com上以前用octopress生成的
-blog放上去，负载基本上还是零，郁闷了，准备捣鼓wordpress了。 安装wordpress &hellip;">
+	<meta name="description" content="这几天 wordpress 也搭建好了，就开始折腾了，别的配置都是比较简单的，基本上就是换主题，改插件的事情。不懂php也就没有大的改动，就是找了个能看的过去的主题用了个 cache 的插件优化了下，为了听音乐还在侧边栏贴上了个虾米播播，虾米的服务挺好的，赞一个。作为个程学猿还是想在 blog &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -92,6 +90,225 @@ blog放上去，负载基本上还是零，郁闷了，准备捣鼓wordpress了�
 
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h1 class="title"><a href="/blog/2012/11/08/dai-ma-gao-liang-zhe-teng-bi-ji/">代码高亮折腾笔记</a></h1>
+	<div class="entry-content">
+		<p>这几天 wordpress 也搭建好了，就开始折腾了，别的配置都是比较简单的，基本上就是换主题，改插件的事情。不懂php也就没有大的改动，就是找了个能看的过去的主题用了个 cache 的插件优化了下，为了听音乐还在侧边栏贴上了个虾米播播，虾米的服务挺好的，赞一个。作为个程学猿还是想在 blog 上分享点代码的，代码显示的不好，连写字的心情都没有。折腾代码的高亮和漂亮的显示是最头疼的事情，还好最后找到了个基本完美的方案，在折腾 wordpress 的同时也研究了下 octopress 的代码高亮，写个日志以为记。</p>
+
+<h2>wordpress 代码高亮方案</h2>
+
+<p>总体上 wordpress 方案就是找插件，但是找到个可以用的，用着顺手的插件真的好麻烦,经过了很多的测试终于选定了现在用的插件。下面是各个插件的试用感受。</p>
+
+<ul>
+<li><p><a href="http://www.boke8.net/wordpress-wp-syntax-button.html">WP-Syntax</a></p>
+
+<p>这个插件是我用的第一个插件，还有个 <code>WP-Syntax Button</code> 配套的按钮，用起来还是凑合。但是用了一段后发现严重的问题，在编辑的时候如果来回的在可视化视图和 html 视图之间切换的话会造成代码不能正常的高亮，排版被破坏，而且不支持 tab 缩进，这点是我最不能忍受的。我所有的代码都是 tab 缩进的贴在网页上却把所有的 tab 都删除了，代码看起来就一团糟了。</p></li>
+<li><p><a href="http://codeup.org/archives/128">SyntaxHighlighter</a></p>
+
+<p>因为 WP-Syntax 的不靠谱我又换了这个插件，这个插件比 WP-Syntax 好用的多了，一切都在可视化视图中修改就好，语法也很简单：[lang]code[/lang],这样做就好了而且切换可视化视图和 html 视图的话代码也不会乱掉。但是不支持 tab 缩进的问题依然没有解决。</p></li>
+<li><p><a href="http://www.guansoft.com/syntaxhighlighter.html">SyntaxHighlighter++</a></p>
+
+<p>这个插件完美的解决了我的问题不得不赞个，安装后会在编辑页面出现个新的编辑窗口，把代码贴上去，然后点击插入就好了。支持 tab 缩进，不需要改动 html 代码用着很舒服，还是国人写的，更要支持下，以后不出意外的话这个插件会一直用下去。</p></li>
+</ul>
+
+
+<h2>octopress 代码高亮方案</h2>
+
+<p>   以前用 octopress 写东西的时候没注意代码高亮的问题，原来插入代码为了美观只是在 markdown 文本里面把代码行缩进8个空格，排整齐，效果还凑合，但是这样不会有高亮的效果的，而且手动的打空格是很憋屈的事情。查找了下官方的教程终于找到了适合的方案。</p>
+
+<p>   官方的<a href="http://octopress.org/docs/blogging/code/"> octopress 代码高亮教程</a>,同时还有篇<a href="http://xiongbupt.github.com/blog/2012/06/08/octopressdai-ma-gao-liang/">非官方中文翻译</a>。</p>
+
+<p>   看了这两篇文章后我就准备尝试，但是还是不知道markdown源文件到底该怎么写，幸好 octopress 的<a href="https://github.com/imathis/octopress">官网</a>就托管在 github 上，上面有生成的页面，也有 markdown 源代码,这下可以对照着看了。</p>
+
+<p>   我很喜欢<code>backtick-codeblock</code>的代码高亮方式，很简单，在代码前后加上三个反引号就好了，在 github 上找到了<a href="https://github.com/imathis/octopress/blob/site/source/docs/plugins/backtick-codeblock/index.markdown"> markdown 文件</a>。下面是简单的摘录。</p>
+
+<ul>
+<li><p>语法</p>
+
+<pre><code> ``` [language] [title] [url] [link text] [linenos:false] [start:#] [mark:#,#-#]
+ code snippet
+ ```
+</code></pre></li>
+<li><p>Basic options</p>
+
+<pre><code> [language] - Used by the syntax highlighter. Passing 'plain' disables highlighting.
+ [title] - Add a figcaption to your code block.
+ [url] - Download or reference link for your code.
+ [Link text] - Text for the link, defaults to 'link'.
+</code></pre></li>
+<li><p>源码</p>
+
+<pre><code> ``` ruby Discover if a number is prime http://www.noulakaz.net/weblog/2007/03/18/a-regular-expression-to-check-for-prime-numbers/ Source Article
+ class Fixnum
+   def prime?
+     ('1' * self) !~ /^1?$|^(11+?)\1+$/
+   end
+  end
+ ```
+</code></pre></li>
+<li>显示效果</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>Discover if a number is prime </span><a href='http://www.noulakaz.net/weblog/2007/03/18/a-regular-expression-to-check-for-prime-numbers/'>Source Article</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Fixnum</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">prime?</span>
+</span><span class='line'>    <span class="p">(</span><span class="s1">&#39;1&#39;</span> <span class="o">*</span> <span class="nb">self</span><span class="p">)</span> <span class="o">!~</span> <span class="sr">/^1?$|^(11+?)\1+$/</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>注意事项</h3>
+
+<p>   指定高亮的代码的语言时要写清楚，shell 脚本的语言类型是 <code>sh</code>，即使是 <code>Bash</code> 的脚本也应该用 <code>sh</code>，写作 <code>bash</code> 在  <code>rake generate</code> 的阶段会报错的。</p>
+
+<h3>高亮代码展示</h3>
+
+<figure class='code'><figcaption><span>shell 命令行</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># 升级源，并更新系统</span>
+</span><span class='line'><span class="nv">$ </span>sduo apt-get update <span class="o">&amp;&amp;</span> sudo apt-get upgrade
+</span><span class='line'><span class="c"># 得到系统的内核信息</span>
+</span><span class='line'><span class="nv">$ </span>uname -a
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>c++ 代码</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="cp">#include &lt;iostream&gt;  </span>
+</span><span class='line'><span class="cp">#include &lt;algorithm&gt;  </span>
+</span><span class='line'><span class="cp">#include &lt;string&gt;  </span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="n">main</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>   <span class="n">string</span> <span class="n">str1</span><span class="p">;</span>
+</span><span class='line'>   <span class="n">string</span> <span class="n">str2</span><span class="p">;</span>
+</span><span class='line'>   <span class="k">while</span><span class="p">(</span><span class="n">cin</span><span class="o">&gt;&gt;</span><span class="n">str1</span><span class="o">&gt;&gt;</span><span class="n">str2</span><span class="p">)</span>
+</span><span class='line'>   <span class="p">{</span>
+</span><span class='line'>       <span class="kt">int</span> <span class="n">nLen1</span><span class="p">,</span> <span class="n">nLen2</span><span class="p">,</span> <span class="n">nLen</span><span class="p">;</span>
+</span><span class='line'>       <span class="n">nLen1</span> <span class="o">=</span> <span class="n">str1</span><span class="p">.</span><span class="n">length</span><span class="p">();</span>
+</span><span class='line'>       <span class="n">nLen2</span> <span class="o">=</span> <span class="n">str2</span><span class="p">.</span><span class="n">length</span><span class="p">();</span>
+</span><span class='line'>       <span class="n">nLen</span> <span class="o">=</span> <span class="n">nLen1</span> <span class="o">&gt;</span> <span class="n">nLen2</span> <span class="o">?</span> <span class="n">nLen1</span> <span class="o">:</span> <span class="n">nLen2</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>       <span class="n">reverse</span><span class="p">(</span><span class="n">str1</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">str1</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+</span><span class='line'>       <span class="n">reverse</span><span class="p">(</span><span class="n">str2</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">str2</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+</span><span class='line'>
+</span><span class='line'>       <span class="c1">//高位补零  </span>
+</span><span class='line'>       <span class="k">if</span> <span class="p">(</span><span class="n">nLen</span> <span class="o">&gt;</span> <span class="n">nLen1</span><span class="p">)</span> <span class="n">str1</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">nLen</span> <span class="o">-</span> <span class="n">nLen1</span><span class="p">,</span> <span class="sc">&#39;0&#39;</span><span class="p">);</span>
+</span><span class='line'>       <span class="k">if</span> <span class="p">(</span><span class="n">nLen</span> <span class="o">&gt;</span> <span class="n">nLen2</span><span class="p">)</span> <span class="n">str2</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">nLen</span> <span class="o">-</span> <span class="n">nLen2</span><span class="p">,</span> <span class="sc">&#39;0&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>       <span class="kt">int</span> <span class="n">temp</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>   <span class="c1">//进位数目  </span>
+</span><span class='line'>       <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>       <span class="n">string</span> <span class="n">strResult</span><span class="p">;</span>    <span class="c1">//存储结果  </span>
+</span><span class='line'>
+</span><span class='line'>       <span class="k">while</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">nLen</span><span class="p">)</span>
+</span><span class='line'>       <span class="p">{</span>
+</span><span class='line'>           <span class="k">if</span><span class="p">(</span><span class="n">str1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span><span class="mh">0x30</span> <span class="o">+</span> <span class="n">str2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">temp</span> <span class="o">&gt;</span> <span class="sc">&#39;9&#39;</span><span class="p">)</span>
+</span><span class='line'>           <span class="p">{</span>
+</span><span class='line'>               <span class="n">strResult</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">str1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">str2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="sc">&#39;9&#39;</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">temp</span><span class="p">);</span>
+</span><span class='line'>               <span class="n">temp</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>           <span class="p">}</span>
+</span><span class='line'>           <span class="k">else</span>
+</span><span class='line'>           <span class="p">{</span>
+</span><span class='line'>               <span class="n">strResult</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">str1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">str2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="sc">&#39;0&#39;</span> <span class="o">+</span> <span class="n">temp</span><span class="p">);</span>
+</span><span class='line'>               <span class="n">temp</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>           <span class="p">}</span>
+</span><span class='line'>           <span class="n">i</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>       <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>       <span class="k">if</span><span class="p">(</span><span class="n">temp</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>          <span class="n">strResult</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sc">&#39;1&#39;</span><span class="p">);</span>
+</span><span class='line'>       <span class="n">reverse</span><span class="p">(</span><span class="n">strResult</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">strResult</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+</span><span class='line'>       <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">strResult</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>   <span class="p">}</span>
+</span><span class='line'>   <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-08T17:19:00+08:00" pubdate data-updated="true">Nov 8<span>th</span>, 2012</time></div>
+	<div class="tags">
+
+</div>
+	
+</div></article>
 
 
     <article class="post">
@@ -953,87 +1170,10 @@ blog 很简单：</p>
 	
 </div></article>
 
-
-    <article class="post">
-	<h1 class="title"><a href="/blog/2012/08/03/use-goagent-for-apt-get/">Use Goagent for Apt Get</a></h1>
-	<div class="entry-content">
-		<h2>简介</h2>
-
-<p>goagent 干什么用的 我就不说了 安装百度有大把的教程，apt-get 在安装一些软件的话 如果要从国外下载 那么可以考虑使用这种方法，apt-get 设置代理的方法：</p>
-
-<p>root@bt :~# export http_proxy=http://127.0.0.1:8087
-设置完代理 再</p>
-
-<p>root@bt :~# apt-get update &amp;&amp; sudo apt-get install libreoffice</p>
-
-<p>goagent 速度很快，我没使用 下载速度是 2k/s 收不鸟了 代理下后 速度 200k/s .。。</p>
-
-<h3>安装goagent</h3>
-
-<p>apt-get 设置代理的方法具体看下面的文章:</p>
-
-<p>http://blog.163.com/fanning_7213/blog/static/24965052011026104010570/</p>
-
-<p>想安个xchm看CHM的书，由于自己的机子网络有问题，本想自己下个包安装，没想到信赖包太多，最后只得做罢。</p>
-
-<p>自己是通过代理上网的，到网上搜下了这篇文章，直接按第一种方法，然后sudo apt-get update ; sudo apt-get install xchm</p>
-
-<h3>可以通过三种方法为apt-get设置http代理</h3>
-
-<ul>
-<li>方法一: 这是一种临时的手段，如果您仅仅是暂时需要通过http代理使用apt-get，您可以使用这种方式。
-在使用apt-get之前，在终端中输入以下命令（根据您的实际情况替换yourproxyaddress和proxyport）。
-export http_proxy=http://yourproxyaddress:proxyport</li>
-<li>方法二: 这种方法要用到/etc/apt/文件夹下的apt.conf文件。如果您希望apt-get（而不是其他应用程序）一直使用http代理，您可以使用这种方式。
-注意： 某些情况下，系统安装过程中没有建立apt配置文件。下面的操作将视情况修改现有的配置文件或者新建配置文件。
-gksudo gedit /etc/apt/apt.conf
-在您的apt.conf文件中加入下面这行（根据你的实际情况替换yourproxyaddress和proxyport）。
-Acquire::http::Proxy “http://yourproxyaddress:proxyport”;
-保存apt.conf文件。</li>
-<li>方法三: 这种方法会在您的主目录下的.bashrc文件中添加两行。如果您希望apt-get和其他应用程序如wget等都使用http代理，您可以使用这种方式。
-gedit ~/.bashrc
-在您的.bashrc文件末尾添加如下内容（根据你的实际情况替换yourproxyaddress和proxyport）。
-http_proxy=http://yourproxyaddress:proxyport
-export http_proxy
-保存文件。关闭当前终端，然後打开另一个终端。
-
-<h3>测试</h3>
-
-<p>使用apt-get update或者任何您想用的网络工具测试代理。我使用firestarter查看活动的网络连接。
-如果您为了纠正错误而再次修改了配置文件，记得关闭终端并重新打开，否自新的设置不会生效。
-代理服务器的登录
-如果代理服务器需要登录，那么可以在指定代理服务器地址的时候，用如下格式（根据情况把username，password， yourproxyaddress和proxyport替换为相应内容）：
-http_proxy=http://username:password@yourproxyaddress:proxyport</p></li>
-</ul>
-
-
-		
-		
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-08-03T00:00:00+08:00" pubdate data-updated="true">Aug 3<span>rd</span>, 2012</time></div>
-	<div class="tags">
-
-</div>
-	
-</div></article>
-
 <nav id="pagenavi">
     
+    
+        <a href="/blog/page/2/" class="next">Next</a>
     
     <div class="center"><a href="/blog/archives">Blog Archives</a></div>
 </nav></div>
