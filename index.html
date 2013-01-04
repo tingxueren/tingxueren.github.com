@@ -957,7 +957,7 @@ myblog.com 就会在 /home/wwwroot/ 文件夹下生成网站的文件夹：myblo
 <p>vps 开通的时候只有 root 帐号，一直用 root 帐号的话会不安全的，也没有必要，首先就要建立自己的常用帐号。可以使用以下命令：</p>
 
 <pre><code>    # 建立 you_name 帐号，并加入 sudo 组    
-    # useradd  -G sudo -d /home/you_name -s /bin/bash   you_name
+    # useradd  -G sudo -m -s /bin/bash   you_name
 
     # 设置密码
     # passwd you_name   
@@ -1373,7 +1373,7 @@ UTF-8 的功能，运行起来效果还好。根据这个又修改成了一个�
     
     <div class="center"><a href="/blog/archives">Blog Archives</a></div>
 </nav></div>
-	<footer id="footer" class="inner">Copyright &copy; 2012
+	<footer id="footer" class="inner">Copyright &copy; 2013
 
     tingxueren
 
