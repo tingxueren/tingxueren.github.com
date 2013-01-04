@@ -21,7 +21,7 @@ vps 开通后，就要开始进行配置了。我选择的系统是 ubuntu 10.04
 vps 开通的时候只有 root 帐号，一直用 root 帐号的话会不安全的，也没有必要，首先就要建立自己的常用帐号。可以使用以下命令：
 
         # 建立 you_name 帐号，并加入 sudo 组    
-        # useradd  -G sudo -d /home/you_name -s /bin/bash   you_name
+        # useradd  -G sudo -m -s /bin/bash   you_name
         
         # 设置密码
         # passwd you_name   
