@@ -7,7 +7,7 @@
 	<meta name="author" content="tingxueren">
 
 	
-	<meta name="description" content="转眼间又到了岁末，世界依然没有毁灭，世界末日原来只是个小笑话而已，连圣诞节都过了，看来可以踏实的迎接新的一年的到来了。一年就这么不知不觉的过去了，刚还感叹夏天热的要死，现在又在烦恼这不停下雨的冬日，日子就这么不经意的过。既然到了岁末就不能免俗，盘点下一年的得失展望下新的一年就是应有之意。 &hellip;">
+	<meta name="description" content="很久没有写 blog 了感觉 blog 已经荒废了。上一篇文章在 2012 年底，现在都 2013 年了，2 个多月就这么过去了。在这两个多月从大部分时间在家过年什么都没有做，一直在歇着。1 月底的时候 yardvps 打 5 折， 把 blog 迁移到了这个新的 vps 了，感觉运行很稳定， &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -90,6 +90,196 @@
 
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h1 class="title"><a href="/blog/2013/03/06/tar-pai-chu-zhi-ding-mu-lu/">Tar 排除指定目录</a></h1>
+	<div class="entry-content">
+		<p>很久没有写 blog 了感觉 blog 已经荒废了。上一篇文章在 2012 年底，现在都 2013 年了，2 个多月就这么过去了。在这两个多月从大部分时间在家过年什么都没有做，一直在歇着。1 月底的时候 yardvps 打 5 折， 把 blog 迁移到了这个新的 vps 了，感觉运行很稳定，价格还是很实惠的。blog 搬家没有遇到什么问题，但是今天在用 tar 备份网站的时候遇到点问题，如何排除指定的目录。</p>
+
+<h2>什么是 tar</h2>
+
+<p>Unix和类Unix系统上的压缩打包工具，可以将多个文件合并为一个文件，打包后的文件名亦为“tar”。目前，tar文件格式已经成为POSIX标准，最初是POSIX.1-1988，目前是POSIX.1-2001。 本程序最初的设计目的是将文件备份到磁带上(tape archive)，因而得名tar。(摘抄自维基百科)</p>
+
+<h2>问题</h2>
+
+<p>我准备是用 tar 备份我的 wordpress 网站的，但是里面有一个目录是 wp-content 下面的 backup 目录有以前的备份，我想把这个排除掉，想起以前用 tar 备份系统的时候用的 &#8211;exclude 参数，开始是这么写的：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd</span> /home/wwwroot
+</span><span class='line'>tar cpzf www.mars.tingxuere.com.tar.gz www.mars.tingxueren.com --exclude<span class="o">=</span>www.mars.tingxueren.com/wp-content/backup/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>很遗憾运行后还是不行，我以为是路径写的有问题，下面用绝对路径</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd</span> /home/wwwroot
+</span><span class='line'>tar cpzf www.mars.tingxuere.com.tar.gz www.mars.tingxueren.com --exclude<span class="o">=</span>/home/wwwroot/www.mars.tingxueren.com/wp-content/backup/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>同样还是不行的，不知道为什么，感觉可能是 &#8211;exclude 参数我的理解有问题。</p>
+
+<h2>实验</h2>
+
+<p>首先 man tar 看看 &#8211;exclude 参数是干吗的:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'> --exclude<span class="o">=</span>PATTERN
+</span><span class='line'>       exclude files, given as a PATTERN
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>从上面看到 &#8211;exclude 排除的目录不是目录的路径，而是按照正则表达式的形式排除的，PATTERN是也。理解错误在 &#8211;exclude 后面跟路径当然达不到我的目标，下面是个很简单的实验：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">pwd</span>
+</span><span class='line'>/home/user
+</span><span class='line'><span class="nv">$ </span>mkdir <span class="nb">test</span>
+</span><span class='line'><span class="nv">$ </span><span class="nb">cd test</span>
+</span><span class='line'><span class="nv">$ </span>mkdir test01 test02
+</span><span class='line'><span class="nv">$ </span><span class="nb">cd </span>test01
+</span><span class='line'><span class="nv">$ </span>touch test01.txt
+</span><span class='line'><span class="nv">$ </span><span class="nb">cd</span> ../test02
+</span><span class='line'><span class="nv">$ </span>touch test02.txt
+</span><span class='line'><span class="nv">$ </span><span class="nb">cd</span>
+</span><span class='line'><span class="nv">$ </span>tar cvzf test.tar.gz <span class="nb">test</span> --exclude<span class="o">=</span>/home/user/test/test02
+</span><span class='line'><span class="nb">test</span>/
+</span><span class='line'><span class="nb">test</span>/test01/
+</span><span class='line'><span class="nb">test</span>/test01/test01.txt
+</span><span class='line'><span class="nb">test</span>/test02/
+</span><span class='line'><span class="nb">test</span>/test02/test02.txt
+</span><span class='line'><span class="c"># 可以看到 --exclude 没有起到效果</span>
+</span><span class='line'><span class="nv">$ </span>tar cvzf test.tar.gz <span class="nb">test</span> --exclude<span class="o">=</span>test02/
+</span><span class='line'><span class="nb">test</span>/
+</span><span class='line'><span class="nb">test</span>/test01/
+</span><span class='line'><span class="nb">test</span>/test01/test01.txt
+</span><span class='line'><span class="nb">test</span>/test02/
+</span><span class='line'><span class="nb">test</span>/test02/test02.txt
+</span><span class='line'><span class="c"># --exclude 依然没有效果，因为 tar 打包过程中找不到与 test02/ 匹配的项目，注意最后的`/`</span>
+</span><span class='line'><span class="nv">$ </span>tar cvzf test.tar.gz <span class="nb">test</span> --exclude<span class="o">=</span>test02
+</span><span class='line'><span class="nb">test</span>/
+</span><span class='line'><span class="nb">test</span>/test01/
+</span><span class='line'><span class="nb">test</span>/test01/test01.txt
+</span><span class='line'><span class="c"># 顺利的达到目标</span>
+</span><span class='line'><span class="c"># --exclude 后面是正则表达式，还可以排除文件夹中具体的文件</span>
+</span><span class='line'><span class="c"># 保留 test02 文件夹，去除 test02.txt</span>
+</span><span class='line'><span class="nv">$ </span>tar cvzf test.tar.gz <span class="nb">test</span> --exclude<span class="o">=</span>test02/*.txt
+</span><span class='line'><span class="nb">test</span>/
+</span><span class='line'><span class="nb">test</span>/test01/
+</span><span class='line'><span class="nb">test</span>/test01/test01.txt
+</span><span class='line'><span class="nb">test</span>/test02/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>疑惑</h2>
+
+<p>在搜索过程中看到了有人写到：在 GNU tar 中用 &#8211;exclude 参数时，被打包的文件必须要放在最后，否则没有效果，但是我实验了下发现被打包文件放在前面和后面都是一样的，不知是这个 bug 被修复了，还是以讹传讹的错误：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>tar --version
+</span><span class='line'>tar <span class="o">(</span>GNU tar<span class="o">)</span> 1.26
+</span><span class='line'>Copyright <span class="o">(</span>C<span class="o">)</span> 2011 Free Software Foundation, Inc.
+</span><span class='line'>License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;.
+</span><span class='line'>This is free software: you are free to change and redistribute it.
+</span><span class='line'>There is NO WARRANTY, to the extent permitted by law.
+</span><span class='line'>
+</span><span class='line'>Written by John Gilmore and Jay Fenlason.
+</span><span class='line'><span class="c"># test 放在 --exclude 前面</span>
+</span><span class='line'><span class="nv">$ </span>tar cvzf test.tar.gz <span class="nb">test</span> --exclude<span class="o">=</span>test02
+</span><span class='line'><span class="nb">test</span>/
+</span><span class='line'><span class="nb">test</span>/test01/
+</span><span class='line'><span class="nb">test</span>/test01/test01.txt
+</span><span class='line'><span class="c"># test 放在 --exclude 后面</span>
+</span><span class='line'><span class="nv">$ </span>tar cvzf test.tar.gz  --exclude<span class="o">=</span>test02 <span class="nb">test</span>
+</span><span class='line'><span class="nb">test</span>/
+</span><span class='line'><span class="nb">test</span>/test01/
+</span><span class='line'><span class="nb">test</span>/test01/test01.txt
+</span><span class='line'><span class="c"># 可以看到上述两种写法，执行效果一致</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-06T19:07:00+08:00" pubdate data-updated="true">Mar 6<span>th</span>, 2013</time></div>
+	<div class="tags">
+
+</div>
+	
+</div></article>
 
 
     <article class="post">
@@ -1321,45 +1511,6 @@ UTF-8 的功能，运行起来效果还好。根据这个又修改成了一个�
 
 
 <time datetime="2012-08-07T21:26:00+08:00" pubdate data-updated="true">Aug 7<span>th</span>, 2012</time></div>
-	<div class="tags">
-
-</div>
-	
-</div></article>
-
-
-    <article class="post">
-	<h1 class="title"><a href="/blog/2012/08/05/new-blog-with-octopress/">New Blog With Octopress</a></h1>
-	<div class="entry-content">
-		<h2>新的 blog</h2>
-
-<p>对前几天建立的 blog ，基于 jekyllbootstrap 感到不爽，就换了个模板，即</p>
-
-<p>基于 Octopress, 感觉这个配色还有配置我挺喜欢的。都是基于 jekyll 的，但是</p>
-
-<p>Octopress 要求的更多，操作起来更复杂些。要求 Ruby 1.9.3 的支持，还有安装</p>
-
-<p>一大堆的 gem, 不过还好，效果蛮不错的，暂时就先这样了。</p>
-
-		
-		
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-08-05T11:52:00+08:00" pubdate data-updated="true">Aug 5<span>th</span>, 2012</time></div>
 	<div class="tags">
 
 </div>
