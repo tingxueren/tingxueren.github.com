@@ -7,7 +7,7 @@
 	<meta name="author" content="tingxueren">
 
 	
-	<meta name="description" content="很久没有写 blog 了感觉 blog 已经荒废了。上一篇文章在 2012 年底，现在都 2013 年了，2 个多月就这么过去了。在这两个多月从大部分时间在家过年什么都没有做，一直在歇着。1 月底的时候 yardvps 打 5 折， 把 blog 迁移到了这个新的 vps 了，感觉运行很稳定， &hellip;">
+	<meta name="description" content="昨天 HDC 的下载网站终于恢复了，换了个马甲 hdwing.com 重新开始提供 PT 服务。原有的 HDC 的数据都还在，网站也迁移到了美国感觉靠谱多了，至少不用担心莫名其妙的被拔网线的问题了。登陆后看了下，除了 logo 更换了，其他的都是那么的熟悉，看到了自己的数据都还在，顿时泪流满面 &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -90,6 +90,174 @@
 
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h1 class="title"><a href="/blog/2013/03/23/vpsan-zhuang-delugebing-she-zhi-iptablesgui-ze/">Vps 安装 Deluge 并设置 Iptables 规则</a></h1>
+	<div class="entry-content">
+		<p>昨天 HDC 的下载网站终于恢复了，换了个马甲 <a href="www.hdwing.com">hdwing.com</a> 重新开始提供 PT 服务。原有的 HDC 的数据都还在，网站也迁移到了美国感觉靠谱多了，至少不用担心莫名其妙的被拔网线的问题了。登陆后看了下，除了 logo 更换了，其他的都是那么的熟悉，看到了自己的数据都还在，顿时泪流满面。</p>
+
+<h2>下载工具</h2>
+
+<p>Windows 下没什么挑剔的，用 utorrent 就一切 ok。Linux 却要费一番思量，PT 网站支持的客户端还挺多的，有 ktorrent、rtorrent、transmission 和 deluge 等等。以前一直在用 ubuntu 自带的 transmission, 挺简洁也很小巧，但是悲剧的是从 ubuntu 12.04 起，transmission 升级到了2.77 版，HDC 支持的 transmission 最新也直到了 2.73 版，所以就悲剧了。deluge 貌似支持的到了最新的 1.3.5 版本了，所以就准备安装 deluge 作为下载工具了。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>sudo apt-get install deluged deluge-web
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> 执行上述的命令就安装好了，具体的如何设置的可以参见这篇 <a href="http://sunsea.im/deluge-config.html">blog</a>。</p>
+
+<h2>设置 nginx 代理</h2>
+
+<p>deluge 安装后默认的在 8182 端口打开 web 服务，但是因为 vps 上已经安装上了 LNMP 环境，所以想用 nginx 将 8182 端口映射到 80 端口，减少端口暴露，同时也便于管理。本文参考了 <a href="http://blog.dayanjia.com/2012/12/seedbox-configuration-example/">Seedbox配置实例</a> ,和 <a href="http://forum.deluge-torrent.org/viewtopic.php?f=8&amp;t=39329">deluge forum</a>。</p>
+
+<h3>nginx 文件配置</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>将下列配置写入 nginx 域名配置文件
+</span><span class='line'>server <span class="o">{</span>
+</span><span class='line'>   <span class="c">### server port and name ###</span>
+</span><span class='line'>   listen            0.0.0.0:80;
+</span><span class='line'>   listen            <span class="o">[</span>::<span class="o">]</span>:80;
+</span><span class='line'>   server_name         your.domain.net;
+</span><span class='line'>   <span class="k">if</span> <span class="o">(</span><span class="nv">$host</span> !~* ^<span class="o">(</span>your.domain.net<span class="o">)</span><span class="nv">$ </span><span class="o">)</span> <span class="o">{</span> <span class="k">return </span>444; <span class="o">}</span> <span class="c">#URL non matché par le domaine</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>   <span class="c">### Compression ###</span>
+</span><span class='line'>   gzip            on;
+</span><span class='line'>   gzip_static         on;
+</span><span class='line'>   gzip_buffers         32 8k;
+</span><span class='line'>   gzip_comp_level         3;
+</span><span class='line'>   gzip_http_version      1.1;
+</span><span class='line'>   gzip_types         text/css text/xml application/x-javascript application/atom+xml text/mathml text/plain t
+</span><span class='line'>ext/vnd.sun.j2me.app-descriptor text/vnd.wap.wml text/x-component image/x-ms-bmp image/svg+xml application/msword application/rt
+</span><span class='line'>f application/xml application/xhtml+xml application/xml+rss text/javascript application/javascript application/json;
+</span><span class='line'>   gzip_vary         on;
+</span><span class='line'>
+</span><span class='line'>   location / <span class="o">{</span>
+</span><span class='line'>      proxy_pass      http://localhost:8112/;
+</span><span class='line'>      proxy_next_upstream   error timeout invalid_header http_500 http_502 http_503;
+</span><span class='line'>
+</span><span class='line'>      <span class="c">### Set headers ####</span>
+</span><span class='line'>      proxy_set_header   Host         <span class="nv">$host</span>;
+</span><span class='line'>      proxy_set_header   X-Real-IP      <span class="nv">$remote_addr</span>;
+</span><span class='line'>      proxy_set_header   X-Forwarded-For      <span class="nv">$proxy_add_x_forwarded_for</span>;
+</span><span class='line'>
+</span><span class='line'>      <span class="c">### By default we don&#39;t want to redirect it ####</span>
+</span><span class='line'>      proxy_redirect      off;
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>   location ~*^.+<span class="o">(</span>ico|css|js|gif|jpe?g|png<span class="o">)</span><span class="nv">$ </span><span class="o">{</span>
+</span><span class='line'>                proxy_pass              http://localhost:8112;
+</span><span class='line'>      expires         max;
+</span><span class='line'>
+</span><span class='line'>                proxy_next_upstream     error timeout invalid_header http_500 http_502 http_503;
+</span><span class='line'>
+</span><span class='line'>                <span class="c">### Set headers ####</span>
+</span><span class='line'>                proxy_set_header        Host                    <span class="nv">$host</span>;
+</span><span class='line'>                proxy_set_header        X-Real-IP               <span class="nv">$remote_addr</span>;
+</span><span class='line'>                proxy_set_header        X-Forwarded-For         <span class="nv">$proxy_add_x_forwarded_for</span>;
+</span><span class='line'>
+</span><span class='line'>                <span class="c">### By default we don&#39;t want to redirect it ####</span>
+</span><span class='line'>                proxy_redirect          off;
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>通过上面的设置你可以通过 <code>http://your.domain.net</code> 来管理 deluge，和通过 <code>http:// your-ip:8112</code> 效果一致。</p>
+
+<h2>iptables 设置</h2>
+
+<p>默认的情况 deluge 的 incoming ports 和 outgoing ports 都使用的是 random ports,也就是随机端口，这样无法使用 iptables 控制 vps 的访问，造成很大的安全漏洞。deluge 也提供了端口设置，默认的是 6881 到 6891，但是郁闷的是我将 6881-6891的端口的进出都在 iptables 规则中设置为了 accept，连接 pt 服务器的时候还是会显示 blocked, 来回的折腾，关掉/打开 iptables、重启 deluge、甚至最后重启 vps，都是一样的效果。搞了一下午无任何进展，然后突然我想起来是不是端口被服务商封锁了，将默认的端口从 6881-6891 设置为了 56800-56810,然后就工作正常了，WTF。</p>
+
+<h3>iptables 规则</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>iptables -A INPUT -p TCP --dport 56800:56810 -j ACCEPT
+</span><span class='line'>iptables -A INPUT -p UDP --dport 56800:56810 -j ACCEPT
+</span><span class='line'>iptables -A OUTPUT -p TCP --sport 56800:56810 -j ACCEPT
+</span><span class='line'>iptables -A OUTPUT -p UDP --sport 56800:56810 -j ACCEPT
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>经过了上面的设置，deluge 运行还是比较平稳的，占用的资源不是很多。vps 网速特别给力， 上传高峰可达到 5M/s，真是相当不错, 只是硬盘容量太小很遗憾啊。</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-23T15:46:00+08:00" pubdate data-updated="true">Mar 23<span>rd</span>, 2013</time></div>
+	<div class="tags">
+
+</div>
+	
+</div></article>
 
 
     <article class="post">
@@ -1412,105 +1580,6 @@ ssh，ftp，http，https，mysql，openvpn 的端口即可，这个是我的 ipt
 
 
 <time datetime="2012-09-10T20:49:00+08:00" pubdate data-updated="true">Sep 10<span>th</span>, 2012</time></div>
-	<div class="tags">
-
-</div>
-	
-</div></article>
-
-
-    <article class="post">
-	<h1 class="title"><a href="/blog/2012/08/07/shelljiao-ben-fen-xiang/">Shell脚本分享</a></h1>
-	<div class="entry-content">
-		<p>用着 linux 免不了要和 shell 打交道，shell 是个很强大的工具，内置了多有用的程序，配合着 linux 的管道机制，可以将这些小工具组合成各种各样的脚本，为你服务。下面简单的介绍并分享我的几个小脚本。</p>
-
-<h2>脚本的结构</h2>
-
-<ul>
-<li><p>脚本的第一行一般是 <code>#!/bin/bash</code> 或者是 <code>#!/bin/sh</code>, 表明执行脚本的程序为
-<code>bash</code> 或者是 <code>sh</code> 。</p></li>
-<li><p>以 <code>#</code> 开头的为注释，执行时会自动忽略。</p></li>
-<li><p>脚本在执行时可以从外界获取参数，一般执行脚本的格式为 <code>test.sh arg[1] arg[2] ...</code> , 在脚本内部 <code>$0</code> 代表脚本的名称， <code>$1</code> 代表第一个参数，以此类推。</p></li>
-<li><p>脚本中常用的命令</p>
-
-<ul>
-<li><p>find 和 exec</p>
-
-<pre><code># 一般用 find 命令找到符合要求的项目，然后调用 command 处理每一项
-find path [-type] [f]  [-name] ["*.txt"]  -exec command argument '{}' \;
-</code></pre></li>
-<li><p>sed awk cut</p>
-
-<pre><code># 这三个一般都是用来对获取的文本进行处理
-# 获取文件扩展名, 即如果输入为test.txt, 输出为txt
-sed 's/^.*\.//g'
-# 输出 ps aux 的输出项的前两列
-ps aux | awk '{print $1, $2}' 
-# cut 即剪切工具，下面是取出以空格为分隔符，取出第一部分的命令
-cut -d ' '  -f 1   
-</code></pre></li>
-</ul>
-</li>
-</ul>
-
-
-<h2>我的小脚本</h2>
-
-<ul>
-<li><p><a href="/codes/iconv_shell.sh">文本格式转换脚本</a></p>
-
-<p>用 linux 有一个很头疼的问题就就是中文的乱码问题，linux 下中文的编码格式是
-utf-8, windows 默认编码格式是 GB2312， 这导致了 windows 下的文本文件在
-linux 下常常是乱码的，同理 linux 下编辑的文本文件在 windows 下也会乱码。
-为此我们要进行字符编码的转换，即利用 <code>iconv</code> 命令。<code>iconv</code> 命令的基本格式
-如下：</p>
-
-<pre><code>  iconv -f oldcharset -t newcharset  file -o newfile 
-</code></pre>
-
-<p>脚本实现了自动获取字符编码，并转换为 UTF-8 编码的功能，为了解决常常遇到的
-未知编码问题，加入了个默认功能，如果编码未知，强制性的进行 GB18030 到
-UTF-8 的功能，运行起来效果还好。根据这个又修改成了一个右键调用的
-<a href="/codes/UTF8.sh">nautilus-script</a>。</p></li>
-<li><p><a href="/codes/chmod_recursion.sh">批量更改文件权限脚本</a></p>
-
-<p>在拷贝文件时常常遇到拷贝回来的文件的权限不对，一个个更改很麻烦，
-脚本主要用<code>find</code>命令查找对应的项目，然后通过 <code>exec</code> 调用 <code>chmod</code>
-而成，具体请看脚本。</p></li>
-<li><p><a href="/codes/chown_recursion.sh">批量更改文件所有者脚本</a></p>
-
-<p>和上面的脚本很相似，也是用 <code>find</code>, <code>exec</code>, <code>chown</code>,组合而成，
-<code>chown</code>可以同时更改文件的所有者和所属组。</p></li>
-<li><p><a href="/codes/mod-file-extension.sh">更改文件后缀名</a></p>
-
-<p>有时候文件的后缀名不符合要求，如要把 <code>htm</code> 后缀换成 <code>html</code> 后缀，这个脚本
-就很有用。主要用到了一个命令 <code>rename</code>。</p>
-
-<pre><code>  # 将说用的 *.htm 后缀换成 html
-  renam 's/htm$/html' *.htm
-</code></pre></li>
-</ul>
-
-
-		
-		
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-08-07T21:26:00+08:00" pubdate data-updated="true">Aug 7<span>th</span>, 2012</time></div>
 	<div class="tags">
 
 </div>
