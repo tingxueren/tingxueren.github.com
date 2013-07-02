@@ -1,0 +1,1663 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tingxueren's Blog]]></title>
+  <link href="http://tingxueren.github.com/atom.xml" rel="self"/>
+  <link href="http://tingxueren.github.com/"/>
+  <updated>2013-03-23T16:45:38+08:00</updated>
+  <id>http://tingxueren.github.com/</id>
+  <author>
+    <name><![CDATA[tingxueren]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[vps 安装 deluge 并设置 iptables 规则]]></title>
+    <link href="http://tingxueren.github.com/blog/2013/03/23/vpsan-zhuang-delugebing-she-zhi-iptablesgui-ze/"/>
+    <updated>2013-03-23T15:46:00+08:00</updated>
+    <id>http://tingxueren.github.com/blog/2013/03/23/vpsan-zhuang-delugebing-she-zhi-iptablesgui-ze</id>
+    <content type="html"><![CDATA[<p>昨天 HDC 的下载网站终于恢复了，换了个马甲 <a href="www.hdwing.com">hdwing.com</a> 重新开始提供 PT 服务。原有的 HDC 的数据都还在，网站也迁移到了美国感觉靠谱多了，至少不用担心莫名其妙的被拔网线的问题了。登陆后看了下，除了 logo 更换了，其他的都是那么的熟悉，看到了自己的数据都还在，顿时泪流满面。</p>
+
+<h2>下载工具</h2>
+
+<p>Windows 下没什么挑剔的，用 utorrent 就一切 ok。Linux 却要费一番思量，PT 网站支持的客户端还挺多的，有 ktorrent、rtorrent、transmission 和 deluge 等等。以前一直在用 ubuntu 自带的 transmission, 挺简洁也很小巧，但是悲剧的是从 ubuntu 12.04 起，transmission 升级到了2.77 版，HDC 支持的 transmission 最新也直到了 2.73 版，所以就悲剧了。deluge 貌似支持的到了最新的 1.3.5 版本了，所以就准备安装 deluge 作为下载工具了。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>sudo apt-get install deluged deluge-web
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> 执行上述的命令就安装好了，具体的如何设置的可以参见这篇 <a href="http://sunsea.im/deluge-config.html">blog</a>。</p>
+
+<h2>设置 nginx 代理</h2>
+
+<p>deluge 安装后默认的在 8182 端口打开 web 服务，但是因为 vps 上已经安装上了 LNMP 环境，所以想用 nginx 将 8182 端口映射到 80 端口，减少端口暴露，同时也便于管理。本文参考了 <a href="http://blog.dayanjia.com/2012/12/seedbox-configuration-example/">Seedbox配置实例</a> ,和 <a href="http://forum.deluge-torrent.org/viewtopic.php?f=8&amp;t=39329">deluge forum</a>。</p>
+
+<h3>nginx 文件配置</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>将下列配置写入 nginx 域名配置文件
+</span><span class='line'>server <span class="o">{</span>
+</span><span class='line'>   <span class="c">### server port and name ###</span>
+</span><span class='line'>   listen            0.0.0.0:80;
+</span><span class='line'>   listen            <span class="o">[</span>::<span class="o">]</span>:80;
+</span><span class='line'>   server_name         your.domain.net;
+</span><span class='line'>   <span class="k">if</span> <span class="o">(</span><span class="nv">$host</span> !~* ^<span class="o">(</span>your.domain.net<span class="o">)</span><span class="nv">$ </span><span class="o">)</span> <span class="o">{</span> <span class="k">return </span>444; <span class="o">}</span> <span class="c">#URL non matché par le domaine</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>   <span class="c">### Compression ###</span>
+</span><span class='line'>   gzip            on;
+</span><span class='line'>   gzip_static         on;
+</span><span class='line'>   gzip_buffers         32 8k;
+</span><span class='line'>   gzip_comp_level         3;
+</span><span class='line'>   gzip_http_version      1.1;
+</span><span class='line'>   gzip_types         text/css text/xml application/x-javascript application/atom+xml text/mathml text/plain t
+</span><span class='line'>ext/vnd.sun.j2me.app-descriptor text/vnd.wap.wml text/x-component image/x-ms-bmp image/svg+xml application/msword application/rt
+</span><span class='line'>f application/xml application/xhtml+xml application/xml+rss text/javascript application/javascript application/json;
+</span><span class='line'>   gzip_vary         on;
+</span><span class='line'>
+</span><span class='line'>   location / <span class="o">{</span>
+</span><span class='line'>      proxy_pass      http://localhost:8112/;
+</span><span class='line'>      proxy_next_upstream   error timeout invalid_header http_500 http_502 http_503;
+</span><span class='line'>
+</span><span class='line'>      <span class="c">### Set headers ####</span>
+</span><span class='line'>      proxy_set_header   Host         <span class="nv">$host</span>;
+</span><span class='line'>      proxy_set_header   X-Real-IP      <span class="nv">$remote_addr</span>;
+</span><span class='line'>      proxy_set_header   X-Forwarded-For      <span class="nv">$proxy_add_x_forwarded_for</span>;
+</span><span class='line'>
+</span><span class='line'>      <span class="c">### By default we don&#39;t want to redirect it ####</span>
+</span><span class='line'>      proxy_redirect      off;
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>   location ~*^.+<span class="o">(</span>ico|css|js|gif|jpe?g|png<span class="o">)</span><span class="nv">$ </span><span class="o">{</span>
+</span><span class='line'>                proxy_pass              http://localhost:8112;
+</span><span class='line'>      expires         max;
+</span><span class='line'>
+</span><span class='line'>                proxy_next_upstream     error timeout invalid_header http_500 http_502 http_503;
+</span><span class='line'>
+</span><span class='line'>                <span class="c">### Set headers ####</span>
+</span><span class='line'>                proxy_set_header        Host                    <span class="nv">$host</span>;
+</span><span class='line'>                proxy_set_header        X-Real-IP               <span class="nv">$remote_addr</span>;
+</span><span class='line'>                proxy_set_header        X-Forwarded-For         <span class="nv">$proxy_add_x_forwarded_for</span>;
+</span><span class='line'>
+</span><span class='line'>                <span class="c">### By default we don&#39;t want to redirect it ####</span>
+</span><span class='line'>                proxy_redirect          off;
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>通过上面的设置你可以通过 <code>http://your.domain.net</code> 来管理 deluge，和通过 <code>http:// your-ip:8112</code> 效果一致。</p>
+
+<h2>iptables 设置</h2>
+
+<p>默认的情况 deluge 的 incoming ports 和 outgoing ports 都使用的是 random ports,也就是随机端口，这样无法使用 iptables 控制 vps 的访问，造成很大的安全漏洞。deluge 也提供了端口设置，默认的是 6881 到 6891，但是郁闷的是我将 6881-6891的端口的进出都在 iptables 规则中设置为了 accept，连接 pt 服务器的时候还是会显示 blocked, 来回的折腾，关掉/打开 iptables、重启 deluge、甚至最后重启 vps，都是一样的效果。搞了一下午无任何进展，然后突然我想起来是不是端口被服务商封锁了，将默认的端口从 6881-6891 设置为了 56800-56810,然后就工作正常了，WTF。</p>
+
+<h3>iptables 规则</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>iptables -A INPUT -p TCP --dport 56800:56810 -j ACCEPT
+</span><span class='line'>iptables -A INPUT -p UDP --dport 56800:56810 -j ACCEPT
+</span><span class='line'>iptables -A OUTPUT -p TCP --sport 56800:56810 -j ACCEPT
+</span><span class='line'>iptables -A OUTPUT -p UDP --sport 56800:56810 -j ACCEPT
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>经过了上面的设置，deluge 运行还是比较平稳的，占用的资源不是很多。vps 网速特别给力， 上传高峰可达到 5M/s，真是相当不错, 只是硬盘容量太小很遗憾啊。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[tar 排除指定目录]]></title>
+    <link href="http://tingxueren.github.com/blog/2013/03/06/tar-pai-chu-zhi-ding-mu-lu/"/>
+    <updated>2013-03-06T19:07:00+08:00</updated>
+    <id>http://tingxueren.github.com/blog/2013/03/06/tar-pai-chu-zhi-ding-mu-lu</id>
+    <content type="html"><![CDATA[<p>很久没有写 blog 了感觉 blog 已经荒废了。上一篇文章在 2012 年底，现在都 2013 年了，2 个多月就这么过去了。在这两个多月从大部分时间在家过年什么都没有做，一直在歇着。1 月底的时候 yardvps 打 5 折， 把 blog 迁移到了这个新的 vps 了，感觉运行很稳定，价格还是很实惠的。blog 搬家没有遇到什么问题，但是今天在用 tar 备份网站的时候遇到点问题，如何排除指定的目录。</p>
+
+<h2>什么是 tar</h2>
+
+<p>Unix和类Unix系统上的压缩打包工具，可以将多个文件合并为一个文件，打包后的文件名亦为“tar”。目前，tar文件格式已经成为POSIX标准，最初是POSIX.1-1988，目前是POSIX.1-2001。 本程序最初的设计目的是将文件备份到磁带上(tape archive)，因而得名tar。(摘抄自维基百科)</p>
+
+<h2>问题</h2>
+
+<p>我准备是用 tar 备份我的 wordpress 网站的，但是里面有一个目录是 wp-content 下面的 backup 目录有以前的备份，我想把这个排除掉，想起以前用 tar 备份系统的时候用的 &#8211;exclude 参数，开始是这么写的：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd</span> /home/wwwroot
+</span><span class='line'>tar cpzf www.mars.tingxuere.com.tar.gz www.mars.tingxueren.com --exclude<span class="o">=</span>www.mars.tingxueren.com/wp-content/backup/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>很遗憾运行后还是不行，我以为是路径写的有问题，下面用绝对路径</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd</span> /home/wwwroot
+</span><span class='line'>tar cpzf www.mars.tingxuere.com.tar.gz www.mars.tingxueren.com --exclude<span class="o">=</span>/home/wwwroot/www.mars.tingxueren.com/wp-content/backup/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>同样还是不行的，不知道为什么，感觉可能是 &#8211;exclude 参数我的理解有问题。</p>
+
+<h2>实验</h2>
+
+<p>首先 man tar 看看 &#8211;exclude 参数是干吗的:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'> --exclude<span class="o">=</span>PATTERN
+</span><span class='line'>       exclude files, given as a PATTERN
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>从上面看到 &#8211;exclude 排除的目录不是目录的路径，而是按照正则表达式的形式排除的，PATTERN是也。理解错误在 &#8211;exclude 后面跟路径当然达不到我的目标，下面是个很简单的实验：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">pwd</span>
+</span><span class='line'>/home/user
+</span><span class='line'><span class="nv">$ </span>mkdir <span class="nb">test</span>
+</span><span class='line'><span class="nv">$ </span><span class="nb">cd test</span>
+</span><span class='line'><span class="nv">$ </span>mkdir test01 test02
+</span><span class='line'><span class="nv">$ </span><span class="nb">cd </span>test01
+</span><span class='line'><span class="nv">$ </span>touch test01.txt
+</span><span class='line'><span class="nv">$ </span><span class="nb">cd</span> ../test02
+</span><span class='line'><span class="nv">$ </span>touch test02.txt
+</span><span class='line'><span class="nv">$ </span><span class="nb">cd</span>
+</span><span class='line'><span class="nv">$ </span>tar cvzf test.tar.gz <span class="nb">test</span> --exclude<span class="o">=</span>/home/user/test/test02
+</span><span class='line'><span class="nb">test</span>/
+</span><span class='line'><span class="nb">test</span>/test01/
+</span><span class='line'><span class="nb">test</span>/test01/test01.txt
+</span><span class='line'><span class="nb">test</span>/test02/
+</span><span class='line'><span class="nb">test</span>/test02/test02.txt
+</span><span class='line'><span class="c"># 可以看到 --exclude 没有起到效果</span>
+</span><span class='line'><span class="nv">$ </span>tar cvzf test.tar.gz <span class="nb">test</span> --exclude<span class="o">=</span>test02/
+</span><span class='line'><span class="nb">test</span>/
+</span><span class='line'><span class="nb">test</span>/test01/
+</span><span class='line'><span class="nb">test</span>/test01/test01.txt
+</span><span class='line'><span class="nb">test</span>/test02/
+</span><span class='line'><span class="nb">test</span>/test02/test02.txt
+</span><span class='line'><span class="c"># --exclude 依然没有效果，因为 tar 打包过程中找不到与 test02/ 匹配的项目，注意最后的`/`</span>
+</span><span class='line'><span class="nv">$ </span>tar cvzf test.tar.gz <span class="nb">test</span> --exclude<span class="o">=</span>test02
+</span><span class='line'><span class="nb">test</span>/
+</span><span class='line'><span class="nb">test</span>/test01/
+</span><span class='line'><span class="nb">test</span>/test01/test01.txt
+</span><span class='line'><span class="c"># 顺利的达到目标</span>
+</span><span class='line'><span class="c"># --exclude 后面是正则表达式，还可以排除文件夹中具体的文件</span>
+</span><span class='line'><span class="c"># 保留 test02 文件夹，去除 test02.txt</span>
+</span><span class='line'><span class="nv">$ </span>tar cvzf test.tar.gz <span class="nb">test</span> --exclude<span class="o">=</span>test02/*.txt
+</span><span class='line'><span class="nb">test</span>/
+</span><span class='line'><span class="nb">test</span>/test01/
+</span><span class='line'><span class="nb">test</span>/test01/test01.txt
+</span><span class='line'><span class="nb">test</span>/test02/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>疑惑</h2>
+
+<p>在搜索过程中看到了有人写到：在 GNU tar 中用 &#8211;exclude 参数时，被打包的文件必须要放在最后，否则没有效果，但是我实验了下发现被打包文件放在前面和后面都是一样的，不知是这个 bug 被修复了，还是以讹传讹的错误：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>tar --version
+</span><span class='line'>tar <span class="o">(</span>GNU tar<span class="o">)</span> 1.26
+</span><span class='line'>Copyright <span class="o">(</span>C<span class="o">)</span> 2011 Free Software Foundation, Inc.
+</span><span class='line'>License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;.
+</span><span class='line'>This is free software: you are free to change and redistribute it.
+</span><span class='line'>There is NO WARRANTY, to the extent permitted by law.
+</span><span class='line'>
+</span><span class='line'>Written by John Gilmore and Jay Fenlason.
+</span><span class='line'><span class="c"># test 放在 --exclude 前面</span>
+</span><span class='line'><span class="nv">$ </span>tar cvzf test.tar.gz <span class="nb">test</span> --exclude<span class="o">=</span>test02
+</span><span class='line'><span class="nb">test</span>/
+</span><span class='line'><span class="nb">test</span>/test01/
+</span><span class='line'><span class="nb">test</span>/test01/test01.txt
+</span><span class='line'><span class="c"># test 放在 --exclude 后面</span>
+</span><span class='line'><span class="nv">$ </span>tar cvzf test.tar.gz  --exclude<span class="o">=</span>test02 <span class="nb">test</span>
+</span><span class='line'><span class="nb">test</span>/
+</span><span class='line'><span class="nb">test</span>/test01/
+</span><span class='line'><span class="nb">test</span>/test01/test01.txt
+</span><span class='line'><span class="c"># 可以看到上述两种写法，执行效果一致</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[2012年度总结]]></title>
+    <link href="http://tingxueren.github.com/blog/2012/12/27/2012nian-du-zong-jie/"/>
+    <updated>2012-12-27T18:24:00+08:00</updated>
+    <id>http://tingxueren.github.com/blog/2012/12/27/2012nian-du-zong-jie</id>
+    <content type="html"><![CDATA[<p>转眼间又到了岁末，世界依然没有毁灭，世界末日原来只是个小笑话而已，连圣诞节都过了，看来可以踏实的迎接新的一年的到来了。一年就这么不知不觉的过去了，刚还感叹夏天热的要死，现在又在烦恼这不停下雨的冬日，日子就这么不经意的过。既然到了岁末就不能免俗，盘点下一年的得失展望下新的一年就是应有之意。</p>
+
+<p>貌似这一年确实没干太多的事情，但也不是全无收获。上学期结束了所有的课程，估计是这辈子在教室中上课的经历就到此为止了。但是课堂上大部分学的东西现在就快忘记了，学过的东西不用的话确实忘记的很快。貌似学了点嵌入式的课程，虚拟现实技术，数据挖掘什么的，现在留在脑子里的东西估计就剩下点名词，实在是惭愧。貌似上半年还在研究 c++ 和 python，c++ 看的好长在4月份的时候终于看完了一遍，只是看完，但是还是不会用的，需要大量的练习才能熟练。研究 python 的原因很简单，就是看到了常用的翻墙软件 GoAgent 就是用 python 写的，代码也就 1000 多行，但是就能用了，感觉很神奇就想看看 python 是什么。看了几本 python 的书，发现了这种语言和常用的 c/c++ 不一样，是种动态的语言，写起来特别的自由，不用关注各种声明、类型等等细节的问题，只关注如何解决问题，用语言将你的想法表现出来就好，确实很好用。用 python 很笨拙的实现了个小词典，功能很简陋，不过是自己写的第一个能用的 python 程序感觉还是很不错，终于自己能编程解决点小问题了，这种感觉相当的棒。</p>
+
+<p>今年的暑假是首次没在家过的暑假，只回家了一周。本来是准备在家呆更长的时间的，但是因为是偷偷的跑的，没和老板打招呼，像个逃兵似的，很快就回来了。暑假开始研究老板布置任务，夸张点来说是要做科研了。暑假主要看了点论文，了解了点什么是 SVM，发现这个还是很好用的，虽然提出的不是特别的久，但是已经应用的很广泛了。假期之间还学了点 shell 编程和 Git，shell 配合着 awk 、sed 这些小工具来处理文本确实很强悍，用着相当的爽。Git 学习了点，现在基本上会用，Github 很不错，上面有一堆很有用的项目，貌似现在的程序猿没在 Github 上托管点项目就不好意思和人打招呼似的。现在把 Github 当备份仓库和 blog 来用，相当的不错。</p>
+
+<p>整个下半年基本在折腾项目了，老板的要求很高，但是一直找不到合适的切入点，这点让人纠结死了。从图像到生物特征识别到数据挖掘是来回的折腾，现在主要是整数据挖掘了，做点研究才发现原来学的以为没什么用的数学终于有用场了，现在看书常感觉数学功底不够看不懂，这就是所谓的书到用时方恨少吧。9月到10月还学习了点正则表达式和
+perl 语言，正则表达式是个强大的工具，在处理文本时候特别的有用。</p>
+
+<p>整整一年，彻底的皈依了 Linux 教，完全用 Linux 当作主机用了一年。从一个菜鸟渐渐的学会了走，渐渐的不那么菜了，也会点小技巧了，我相信继续努力总有一天我会学会飞翔的。玩了 Linux 一年了解了系统的启动，软件的安装，编译，调试等等细节，学会了写点小脚本解决碰到的小问题。这一年养成了在终端下干活的习惯，感觉终端真是的牛逼的东西，还养成了对图形界面莫名其妙的优越感，这点很没必要一定要改正。师兄们走后用他们的电脑当服务器折腾了好几个月，终于知道了 Linux 服务器是怎么干活的了，初步的会配置个能干活的服务器了，后来又买了 VPS 自己管理发现真正的要保证服务器的高可用性是个很大的挑战。玩服务器有种大权操之我手的感觉，这感觉真不错，以后确实想去当 SA，据说压力比较大，但是喜欢就好。后来买了个域名，从不懂到懂，一步步建立了 bolg，搭建 blog 环境，配置 VPS，一整套做下来对书上写的东西理解的更透彻了，原来这些也不是特别的神秘。</p>
+
+<p>这一年还是与 #GFW 斗争的一年，在与 #GFW 斗争的过程中我还学习到了很多的知识，从好的一方面来讲 #GFW 是学习的动力，有了 #GFW 中国的程序猿的网络编程水平有了大幅度的提高。折腾过了 GAE 系列的工具，SSH，VPN，还买了个路由器在路由器上跑 VPN, 效果还不错。总体来看墙是慢慢加高的，那就继续和 #GFW 玩猫捉老鼠的游戏吧，直到彻底玩完为止。绝不妥协！！！</p>
+
+<p>2012年大部分是在实验室中度过的，但是还是出去过几次的。春天去太子湾看樱花，雪白的樱花配着红色的郁金香特别的好看；夏天的西湖的荷花也颇为可观；中秋的时候欣赏钱塘潮水确实感受到了潮水的凶险，当时看到了大潮过去了，感觉在岸边看到不过瘾，就冒险下到了丁字坝上靠近看潮水，刚拍了几张照片，突然看到了水面以肉眼可见的速度上涨了，赶紧的想跑上岸，但是已经来不及了，幸好回头潮是拍在靠近堤坝的一侧而不是我们站立的靠江心一侧我们才捡了条小命。这是我这几年面临的最危险的情况，吓死了，幸运的是没有出现悲剧；还去了上海去2次，基本上走马观花，随便看看，上海的那些中西合璧的老建筑还是很不错的。没有爬过山，没有去海边是这一年的遗憾，希望下一年能有机会去爬爬山，去海边吹吹风。</p>
+
+<p>这一年来遗憾的事情确实还很不少，感情方面还是一无所获，悲剧啊！学业方面貌似没什么太大的进步，没有为课堂生涯划上个圆满的句号。研究方面才刚刚开始，前途应该是很光明的，多努力我相信我会捡到属于我的那个贝壳。总体来说这一年还是比较充实的，有努力、有收获、有悔恨、有遗憾，研究生的生涯已经过了一半，貌似明年这个时候基本上就结束了，压力很大，自身的缺陷还很多，不知道明年能不能为自己找到个好买家。一切空想均是无用，脚踏实地的弥补自己的不足，提升自己的能力才是王道，以此自勉！ 2012 就要过去，很快会迎来新的一年，新的一年是充满挑战的，希望自己能好好把握新的一年，能在新的一年过的精彩，在明年这个时候写总结的时候我希望我是在笑着写的！</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[出离的愤怒]]></title>
+    <link href="http://tingxueren.github.com/blog/2012/12/07/chu-chi-de-fen-nu/"/>
+    <updated>2012-12-07T21:44:00+08:00</updated>
+    <id>http://tingxueren.github.com/blog/2012/12/07/chu-chi-de-fen-nu</id>
+    <content type="html"><![CDATA[<p>最近翻墙一直不正常，从“斯巴达”之前开始的，以为是党国开会，正常现象，等过一段时间会开完了，党国的 G 点降低了就会恢复正常。但是美好的期望却往往得到失望的结果，会议早已开完，但是网络封锁却越发的严重了。现在的情况是：openvpn 全线阵亡，即使可以加上前端代理，通过443端口也是命不久已；ssh 隧道基本正常，但是感觉貌似 #GFW 已经很聪明的学会了流量类型识别，通过 ssh 上网没问题，但是想通过 ssh 给 ubuntu 更新下 chrome 都成了问题， WTF；GAE 系统的基本上还算正常，多亏了 google 有 N 多的 ip。一个 ip 网段封锁后换新的 ip 又是一条好汉，所有 ip 都被封锁的那天就不折腾了，那时估计大中华局域网早就建成了。GAE 无法正常的传输 https 的流量，只能用伪造证书来勉强支持 https，慎用为妙。</p>
+
+<p>GFW 的技术水平越来越高了，现在的翻墙简直就是像当年的游击战的架式，你来我往互有攻防。最开始的时候的网页代理，然后的轮子的一批工具，以“自由门”为代表，再然后是 GAE 平台的工具，SSH 隧道，各种 vpn。一个个都前赴后继的被挂掉了，人们牢牢的被封锁在高墙之中，能够自由呼吸的空间越来越少。特别是最近 #GFW 的技术有了很大的进步，基于 openssl 的各种工具都要快失效了。为了更好的对付人们的翻墙手段，竟然引入了机器学习的手段来对加密流量进行分析，打击准确，见血封喉，大家可以拜读下方院士近期发表的<a href="http://tingxueren.github.com/docs/%E7%BD%91%E7%BB%9C%E6%B5%81%E9%87%8F%E5%88%86%E7%B1%BB%E7%A0%94%E7%A9%B6%E8%BF%9B%E5%B1%95%E4%B8%8E%E5%B1%95%E6%9C%9B.pdf">这篇大作</a>，相信会有不少收获。</p>
+
+<p>都忘记了什么时候开始翻墙了，貌似是莫一天搜索到了有趣的帖子，但是点击链接却是“链接被重置”，现在感觉到很熟悉的错误提示信息，当时却是一片茫然。人都是有好奇心的，越不让人看的东西却千方百计的想看到，压迫的越狠，反抗的越厉害。最终我还是看到了，了解到了 “墙”、“功夫网”、“GFW” 等等的这些很有些特殊含义的词汇。从开始的简单的通过网页翻墙，到现在尝试了 N 种工具却无法翻越这座高墙，我慢慢的明白的墙的含义。</p>
+
+<h2>墙的不断升级就是在给你造成一种压力：别折腾了，你斗不过我的。单个人是无法与国家相抗衡的，但你放弃的时候，有个躲在角落的人会偷偷的在笑。翻墙是一种姿态，无论多难，都不要放弃，这代表了一种不妥协的勇气。</h2>
+
+<p>其实翻墙的目的很简单，就是为了用更好的服务。当你在 Baidu 上想找个软件，在搜索的结果中翻了几页才找到软件的官网时，当你想搜索点学术论文时，你会发现 google 是你更好的选择。为了全平台的同步我的文件我选择了 Dropbox， 不幸也被墙掉，flickr 被墙，blogger 被墙，Twitter 被墙，Facebook 被墙 。。。 貌似好东西都会被墙掉，被 #GFW 认证的东西才被认为是有价值的，然后国内冒出来一批山寨的东西。互联网本来是没有国界的，但是貌似现在变成了两个网络，一个是国际互联网，一个是中国互联网，好像什么东西到了中国都会变成了“有中国特色”，真是奇怪。可能你感觉墙了就墙了，反正这些服务我从来不用，和我没关系，是的，短时间是没关系的，但是从长远来看，关起门来自娱自乐会让我们与这个快速发展的世界脱节，重新回到“天朝”的迷梦中。“我大清”可是万邦来朝，呵呵。。。</p>
+
+<h3>有压迫的地方就有反抗，是楼总是会塌的，是墙总是会倒的，我坚信这一点。希望在不久的将来让我能忘记墙这码事，能够自由的访问互联网。</h3>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[today is SB]]></title>
+    <link href="http://tingxueren.github.com/blog/2012/11/29/today-is-sb/"/>
+    <updated>2012-11-29T20:26:00+08:00</updated>
+    <id>http://tingxueren.github.com/blog/2012/11/29/today-is-sb</id>
+    <content type="html"><![CDATA[<p>这两天遇到了很 SB 的事情，在脑袋冲动的情况下做出了很多 SB 的不理智的决定。记录下来，等以后再 SB 的时候拿出来看看。</p>
+
+<h2>缘起</h2>
+
+<p>一切的开端始于昨天早上，一早到实验室就发现我无法通过 SSH 登陆到我的 VPS 了。虽然现在手里的这个 VPS 有很多的不足：OpenVZ 架构的，空间很小，最近服务不稳定，特别是最近基本上三天两头的宕机。 但是总体上还是不错的，流量不限制，延迟很小，在上面搭建的 openvpn 虽然已经被 #GFW 干废掉了，但是添加上前端代理后还是可以用的，最重要的还是比较便宜，一个月不到40块还是能接受的。</p>
+
+<h2>发展</h2>
+
+<p>突然不能 SSH 登录了，但是网站和 openvpn 都正常的工作，第一个念头是伟大的 #GFW 的干扰，#GFW 做这件事情不是一次两次了。但是挂上全局 VPN 后依然无法 SSH 登陆 。看了不是 #GFW 的问题，以为是 iptables 的问题了，进入管理网页清空 iptables 规则后还是不行，通过网页重启了机器后还是不行，火大了。运营商提供的网页的 consle的端口也被禁用了，救命稻草也没了，不清楚到底出现了什么问题，给运营商发邮件但是迟迟收不到邮件。脑子抽了准备恢复系统了，还好 ftp 还是正常的，通过 ftp 备份了不少配置和网站的文件，还好应该损失不大。</p>
+
+<p>等系统重置完成了，收到了回复的邮件：运营商在做虚拟机的迁移，在此期间 VPS 可能工作不正常。我估计 SSH 无法登陆的原因是但是我的 VPS 正在做迁移，VPS 其实是工作正常的，应该是为了迁移的安全运营商暂停了 SSH 的登陆。把系统重装了纯粹是瞎忙活，没办法了，系统重置了还是要把它恢复原装的。按照正常的步骤，登陆，升级，建立账户，设置配置。重启，然后又进不去了，诡异的画面一再出现，把我郁闷的不行，都要吐血了。</p>
+
+<h2>高潮</h2>
+
+<p>昨天夜里又尝试了好几次，恢复了几次系统。问题依旧，开始能登上，升级系统，打打补丁后又登陆不上去了，仔细的排查过了 iptables , sshd_config 都没什么问题。然后就想干脆换个 VPS 提供商吧。逛逛网站发现了 YardVPS ，现在有7折的优惠，一个月35块，和我现在用的差不多。一冲动又拍脑袋买了个，忘记了网上各位对他家服务的诟病 。开通邮件倒是很快收到了，控制面板上也显示了 VPS 已经再线，但是就是 ping 不通，也无法 SSH 登陆。YardVPS 立马给我展示了他们的糟糕的服务，邮件发了，后台看到正在跑了，但是其实 VPS 还是没有开通。google 了下看来和我有同样遭遇的不只一个人。没办法只好发 ticket，杯具的美国时间还没上班，要等到美国人上班了才会处理 ticket，怀着郁闷的心情睡觉去了。</p>
+
+<h2>后续</h2>
+
+<p>早上来了，发现新买的这个 VPS 终于开通了，配置下吧。发现除了客服不给力和美国线路延迟大上传下载比较慢之外，其他的基本比较满意。上午收到了原来的 VPS 提供商的邮件，维护结束一切正常。但是我的 VPS 还是无法用 SSH 登陆，重新生成系统，打补丁，重启，又不能登陆系统了。次凹，到底是怎么回事，突然我想起来了在升级系统前是可以登陆的，升级系统后就不可以登陆了，问题一定出在了系统更新的头上。再次生成系统，慢慢的一步步升级系统，终于找到原因了，原来系统升级的时候会更改 <code>/etc/init/ssh.conf</code> 这个文件，本来默认的规则是保留现在用的，但是脑子抽了，就选择成了升级规则了，新规则估计和主机不兼容什么的然后就不能用，好郁闷啊，原来事情就是这么简单，搞得我折腾了 2 天，重装了系统不下于 10 次。我真的是个 SB。</p>
+
+<h2>终章</h2>
+
+<p>现在 VPS 终于恢复到了和一前一样了，貌似跑的也很顺畅。一番折腾纠结了 2 天，多买了个不需要的 VPS ，浪费了一个月钱。现在只能想让两个都跑着，观察下，看那个更稳定下个月就用哪个了。看来“冲动是魔鬼”确实所言不虚，脑子不冷静的状态下做的决定往往会把事情搞的更糟糕，引以为戒吧，以后再犯二的时候就回头来看看这篇帖子。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Linux 常用网络工具]]></title>
+    <link href="http://tingxueren.github.com/blog/2012/11/24/linux-chang-yong-wang-luo-gong-ju/"/>
+    <updated>2012-11-24T18:22:00+08:00</updated>
+    <id>http://tingxueren.github.com/blog/2012/11/24/linux-chang-yong-wang-luo-gong-ju</id>
+    <content type="html"><![CDATA[<p>既然享受了上网的便利，有时候就不得不忍受网络带来的痛苦。正上网看视频看的 high, 突然网页卡死了，刷新后网页都打不开，正聊 QQ 突然掉线了，想访问些国外网站发现输入域名后跳转到莫名其妙的网站，这时候你就要检查下自己的网络问题了。“工欲善其事，必先利其器”， Linux 下有很好用的网络工具，掌握了这些工具基本上就能找到网络出毛病的原因，自己动手修复了。</p>
+
+<h2>常用工具</h2>
+
+<p>常用的工具一般有：ping、ifconfig、traceroute、nslookup、dig、whois、iftop、ntop等，下面简要介绍下</p>
+
+<h3>ping</h3>
+
+<p>ping 很简单，也是最常用的工具，常常用来测试网络是否联通，用法：ping ip/host 即可，Windows 下也用同样的命令</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># 测试网络是否联通</span>
+</span><span class='line'><span class="nv">$ </span>ping  baidu.com
+</span><span class='line'><span class="c"># 有时候 ping 的返回会很慢，这是因为 ping 会尽量将 ip 转化为域名，如果对应 ip 没有设置域名</span>
+</span><span class='line'><span class="c"># 解析的话会直到超时才返回，可以添加 -n 参数，让 ping 立即得到返回数据</span>
+</span><span class='line'><span class="nv">$ </span>ping -n 8.8.8.8
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>ifconfig</h3>
+
+<p>ifconfig 是用来查看本机网络的各种接口的， Windows 下对应命令为 ipconfig</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># 本机执行 ifconig</span>
+</span><span class='line'><span class="nv">$ </span>ifconfig
+</span><span class='line'>eth0      Link encap:Ethernet  HWaddr 8c:89:a5:39:**:**
+</span><span class='line'>          inet addr:192.168.1.100  Bcast:192.168.1.255  Mask:255.255.255.0
+</span><span class='line'>          inet6 addr: fe80::8e89:a5ff:fe39:5c96/64 Scope:Link
+</span><span class='line'>          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+</span><span class='line'>          RX packets:3591303 errors:0 dropped:10 overruns:0 frame:0
+</span><span class='line'>          TX packets:3219419 errors:0 dropped:0 overruns:0 carrier:0
+</span><span class='line'>          collisions:0 txqueuelen:1000
+</span><span class='line'>          RX bytes:3257148705 <span class="o">(</span>3.2 GB<span class="o">)</span>  TX bytes:448474566 <span class="o">(</span>448.4 MB<span class="o">)</span>
+</span><span class='line'>          Interrupt:43 Base address:0xe000
+</span><span class='line'>
+</span><span class='line'>lo        Link encap:Local Loopback
+</span><span class='line'>          inet addr:127.0.0.1  Mask:255.0.0.0
+</span><span class='line'>          inet6 addr: ::1/128 Scope:Host
+</span><span class='line'>          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+</span><span class='line'>          RX packets:321987 errors:0 dropped:0 overruns:0 frame:0
+</span><span class='line'>          TX packets:321987 errors:0 dropped:0 overruns:0 carrier:0
+</span><span class='line'>          collisions:0 txqueuelen:0
+</span><span class='line'>          RX bytes:75444551 <span class="o">(</span>75.4 MB<span class="o">)</span>  TX bytes:75444551 <span class="o">(</span>75.4 MB<span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># MAC地址我做了注释，可以看到本机只用一个网卡 eth0，lo 为本地环回接口</span>
+</span><span class='line'><span class="c"># 本机 ip 为 192.168.1.100, 为一个私有地址，因为我的电脑是接在路由器下面的</span>
+</span><span class='line'><span class="c"># 其他参数可以 man ifconfig</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>traceroute</h3>
+
+<p>traceroute 是个路由跟踪命令，可以跟踪从本机到目标 ip 的具体路由过程，Windows 下对应的命令是 tracert</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># 本机跟踪到 baidu.com 的路由过程</span>
+</span><span class='line'><span class="nv">$ </span>traceroute baidu.com
+</span><span class='line'>traceroute to baidu.com <span class="o">(</span>123.125.114.144<span class="o">)</span>, 30 hops max, 60 byte packets
+</span><span class='line'> 1  192.168.1.1 <span class="o">(</span>192.168.1.1<span class="o">)</span>  0.485 ms  1.117 ms  1.313 ms
+</span><span class='line'> 2  192.168.149.254 <span class="o">(</span>192.168.149.254<span class="o">)</span>  4.472 ms  4.754 ms  4.785 ms
+</span><span class='line'> *
+</span><span class='line'> *
+</span><span class='line'> 9  219.158.14.97 <span class="o">(</span>219.158.14.97<span class="o">)</span>  43.474 ms  43.522 ms  43.695 ms
+</span><span class='line'>10  123.126.0.66 <span class="o">(</span>123.126.0.66<span class="o">)</span>  47.145 ms  47.186 ms  47.248 ms
+</span><span class='line'>11  61.148.3.34 <span class="o">(</span>61.148.3.34<span class="o">)</span>  49.409 ms  49.523 ms  49.417 ms
+</span><span class='line'>12  202.106.43.66 <span class="o">(</span>202.106.43.66<span class="o">)</span>  39.283 ms 202.106.43.174 <span class="o">(</span>202.106.43.174<span class="o">)</span>  40.238 ms  40.661 ms
+</span><span class='line'>29  * * *
+</span><span class='line'>30  * * *
+</span><span class='line'>
+</span><span class='line'><span class="c"># 为了保密删除了开头的几条路径</span>
+</span><span class='line'><span class="c"># 有些路由禁止探测，比如第29, 30 跳</span>
+</span><span class='line'><span class="c"># 最多跳数为 30, 到了30 跳虽然还没有到 baidu.com 但是命令结束了</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>nslookup</h3>
+
+<p>nslookup 是用来查询 DNS 解析的，通过这个命令可以明显的看到 GFW 的常用手段 “DNS污染”。Windows 下的命令相同</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># 执行 nslookup 用国内 DNS 服务器</span>
+</span><span class='line'><span class="c"># 命令格式: nslookup 域名 DNS服务器</span>
+</span><span class='line'><span class="c"># 查询 twitter.com 通过国内DNS服务器</span>
+</span><span class='line'><span class="nv">$ </span>nslookup twitter.com  221.12.1.227
+</span><span class='line'>Server:       221.12.1.227
+</span><span class='line'>Address:  221.12.1.227#53
+</span><span class='line'>
+</span><span class='line'>Non-authoritative answer:
+</span><span class='line'>Name: twitter.com
+</span><span class='line'>Address: 59.24.3.173
+</span><span class='line'><span class="c"># 通过 whois 查询可知 59.24.3.173 是个韩国ip</span>
+</span><span class='line'><span class="c"># 挂上 vpn 通过 google dns 查询得到正确ip</span>
+</span><span class='line'><span class="nv">$ </span>nslookup twitter.com  8.8.8.8
+</span><span class='line'>Server:       8.8.8.8
+</span><span class='line'>Address:  8.8.8.8#53
+</span><span class='line'>
+</span><span class='line'>Non-authoritative answer:
+</span><span class='line'>Name: twitter.com
+</span><span class='line'>Address: 199.59.150.39
+</span><span class='line'>Name: twitter.com
+</span><span class='line'>Address: 199.59.149.230
+</span><span class='line'>Name: twitter.com
+</span><span class='line'>Address: 199.59.148.10
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>dig</h3>
+
+<p>dig 命令和 nslookup 十分相似，也是用来进行 DNS查询的，命令格式也很简单 <code>dig @server host</code> 即可。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># 我把我的另一个域名 tingxueren.info 指向了 tingxueren.github.com 在 github 上面维护了自己的blog，可以用</span>
+</span><span class='line'><span class="c"># dig 查询下，会发现 ip 一致</span>
+</span><span class='line'><span class="c"># dig tingxueren.info</span>
+</span><span class='line'><span class="nv">$ </span>dig @8.8.8.8 tingxueren.info
+</span><span class='line'>
+</span><span class='line'>; &lt;&lt;&gt;&gt; DiG 9.8.1-P1 &lt;&lt;&gt;&gt; @8.8.8.8 tingxueren.info
+</span><span class='line'>; <span class="o">(</span>1 server found<span class="o">)</span>
+</span><span class='line'>;; global options: +cmd
+</span><span class='line'>;; Got answer:
+</span><span class='line'>;; -&gt;&gt;HEADER<span class="s">&lt;&lt;- opcode: QUERY, status: NOERROR, id: 16481</span>
+</span><span class='line'><span class="s">;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">;; QUESTION SECTION:</span>
+</span><span class='line'><span class="s">;tingxueren.info.     IN  A</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">;; ANSWER SECTION:</span>
+</span><span class='line'><span class="s">tingxueren.info.  1800    IN  A   204.232.175.78</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">;; Query time: 368 msec</span>
+</span><span class='line'><span class="s">;; SERVER: 8.8.8.8#53(8.8.8.8)</span>
+</span><span class='line'><span class="s">;; WHEN: Sat Nov 24 19:23:45 2012</span>
+</span><span class='line'><span class="s">;; MSG SIZE  rcvd: 49</span>
+</span><span class='line'><span class="s"># dig tingxueren.github.com</span>
+</span><span class='line'><span class="s">dig @8.8.8.8 tingxueren.github.com</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">; &lt;&lt;&gt;&gt; DiG 9.8.1-P1 &lt;&lt;&gt;&gt; @8.8.8.8 tingxueren.github.com</span>
+</span><span class='line'><span class="s">; (1 server found)</span>
+</span><span class='line'><span class="s">;; global options: +cmd</span>
+</span><span class='line'><span class="s">;; Got answer:</span>
+</span><span class='line'><span class="s">;; -&gt;&gt;HEADER&lt;&lt;- opcode</span>: QUERY, status: NOERROR, id: 51234
+</span><span class='line'>;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
+</span><span class='line'>
+</span><span class='line'>;; QUESTION SECTION:
+</span><span class='line'>;tingxueren.github.com.       IN  A
+</span><span class='line'>
+</span><span class='line'>;; ANSWER SECTION:
+</span><span class='line'>tingxueren.github.com.    43200   IN  A   204.232.175.78
+</span><span class='line'>
+</span><span class='line'>;; Query <span class="nb">time</span>: 180 msec
+</span><span class='line'>;; SERVER: 8.8.8.8#53<span class="o">(</span>8.8.8.8<span class="o">)</span>
+</span><span class='line'>;; WHEN: Sat Nov 24 19:26:58 2012
+</span><span class='line'>;; MSG SIZE  rcvd: 55
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>whois</h3>
+
+<p><a href="http://zh.wikipedia.org/zh-cn/WHOIS">WHOIS</a>（读作“Who is”，而非缩写）是用来查询互联网中域名的IP以及所有者等信息的传输协议。上面才查找 twitter 的错误 ip 的时候已经用过了，现在把刚才信息贴出来。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>whois 59.24.3.173
+</span><span class='line'><span class="c"># 韩文显示不正常，省略</span>
+</span><span class='line'><span class="c"># ENGLISH</span>
+</span><span class='line'>
+</span><span class='line'>KRNIC is not an ISP but a National Internet Registry similar to APNIC.
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span> Network Information <span class="o">]</span>
+</span><span class='line'>IPv4 Address       : 59.0.0.0 - 59.31.255.255 <span class="o">(</span>/11<span class="o">)</span>
+</span><span class='line'>Service Name       : KORNET
+</span><span class='line'>Organization Name  : Korea Telecom
+</span><span class='line'>Organization ID    : ORG1600
+</span><span class='line'>Address            : 206, Jungja-dong, Bundang-gu, Sungnam-ci
+</span><span class='line'>Zip Code           : 463-711
+</span><span class='line'>Registration Date  : 20040831
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span> Admin Contact Information <span class="o">]</span>
+</span><span class='line'>Name               : IP Administrator
+</span><span class='line'>Phone              : +82-2-500-6630
+</span><span class='line'>E-Mail             : kornet_ip@kt.com
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span> Tech Contact Information <span class="o">]</span>
+</span><span class='line'>Name               : IP Manager
+</span><span class='line'>Phone              : +82-2-500-6630
+</span><span class='line'>E-Mail             : kornet_ip@kt.com
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span> Network Abuse Contact Information <span class="o">]</span>
+</span><span class='line'>Name               : Network Abuse
+</span><span class='line'>Phone              : +82-2-100-0000
+</span><span class='line'>E-Mail             : abuse@kornet.net
+</span><span class='line'><span class="c"># GFW 常常会把 “非法网站” 进行 DNS 投毒，解析到韩国的 ip，韩国是躺着也中枪</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>iftop 和 ntop</h3>
+
+<p>这两个工具是用来做流量监控的，iftop 比较简陋，提供的是字符界面，ntop 安装后可以在本机浏览器打开 3000 端口会有图形界面的，内容相当的详细。对这两个工具了解的不多，只是刚开始用，可以看下下面这两个帖子。
+1. <a href="http://www.vpser.net/manage/iftop.html">Linux流量监控工具 - iftop (最全面的iftop教程)</a>
+2. <a href="http://netslyz.blog.51cto.com/1006247/407510/">在RHEL5下使用NTOP监测网络流量</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[代码高亮折腾笔记]]></title>
+    <link href="http://tingxueren.github.com/blog/2012/11/08/dai-ma-gao-liang-zhe-teng-bi-ji/"/>
+    <updated>2012-11-08T17:19:00+08:00</updated>
+    <id>http://tingxueren.github.com/blog/2012/11/08/dai-ma-gao-liang-zhe-teng-bi-ji</id>
+    <content type="html"><![CDATA[<p>这几天 wordpress 也搭建好了，就开始折腾了，别的配置都是比较简单的，基本上就是换主题，改插件的事情。不懂php也就没有大的改动，就是找了个能看的过去的主题用了个 cache 的插件优化了下，为了听音乐还在侧边栏贴上了个虾米播播，虾米的服务挺好的，赞一个。作为个程学猿还是想在 blog 上分享点代码的，代码显示的不好，连写字的心情都没有。折腾代码的高亮和漂亮的显示是最头疼的事情，还好最后找到了个基本完美的方案，在折腾 wordpress 的同时也研究了下 octopress 的代码高亮，写个日志以为记。</p>
+
+<h2>wordpress 代码高亮方案</h2>
+
+<p>总体上 wordpress 方案就是找插件，但是找到个可以用的，用着顺手的插件真的好麻烦,经过了很多的测试终于选定了现在用的插件。下面是各个插件的试用感受。</p>
+
+<ul>
+<li><p><a href="http://www.boke8.net/wordpress-wp-syntax-button.html">WP-Syntax</a></p>
+
+<p>这个插件是我用的第一个插件，还有个 <code>WP-Syntax Button</code> 配套的按钮，用起来还是凑合。但是用了一段后发现严重的问题，在编辑的时候如果来回的在可视化视图和 html 视图之间切换的话会造成代码不能正常的高亮，排版被破坏，而且不支持 tab 缩进，这点是我最不能忍受的。我所有的代码都是 tab 缩进的贴在网页上却把所有的 tab 都删除了，代码看起来就一团糟了。</p></li>
+<li><p><a href="http://codeup.org/archives/128">SyntaxHighlighter</a></p>
+
+<p>因为 WP-Syntax 的不靠谱我又换了这个插件，这个插件比 WP-Syntax 好用的多了，一切都在可视化视图中修改就好，语法也很简单：[lang]code[/lang],这样做就好了而且切换可视化视图和 html 视图的话代码也不会乱掉。但是不支持 tab 缩进的问题依然没有解决。</p></li>
+<li><p><a href="http://www.guansoft.com/syntaxhighlighter.html">SyntaxHighlighter++</a></p>
+
+<p>这个插件完美的解决了我的问题不得不赞个，安装后会在编辑页面出现个新的编辑窗口，把代码贴上去，然后点击插入就好了。支持 tab 缩进，不需要改动 html 代码用着很舒服，还是国人写的，更要支持下，以后不出意外的话这个插件会一直用下去。</p></li>
+</ul>
+
+
+<h2>octopress 代码高亮方案</h2>
+
+<p>   以前用 octopress 写东西的时候没注意代码高亮的问题，原来插入代码为了美观只是在 markdown 文本里面把代码行缩进8个空格，排整齐，效果还凑合，但是这样不会有高亮的效果的，而且手动的打空格是很憋屈的事情。查找了下官方的教程终于找到了适合的方案。</p>
+
+<p>   官方的<a href="http://octopress.org/docs/blogging/code/"> octopress 代码高亮教程</a>,同时还有篇<a href="http://xiongbupt.github.com/blog/2012/06/08/octopressdai-ma-gao-liang/">非官方中文翻译</a>。</p>
+
+<p>   看了这两篇文章后我就准备尝试，但是还是不知道markdown源文件到底该怎么写，幸好 octopress 的<a href="https://github.com/imathis/octopress">官网</a>就托管在 github 上，上面有生成的页面，也有 markdown 源代码,这下可以对照着看了。</p>
+
+<p>   我很喜欢<code>backtick-codeblock</code>的代码高亮方式，很简单，在代码前后加上三个反引号就好了，在 github 上找到了<a href="https://github.com/imathis/octopress/blob/site/source/docs/plugins/backtick-codeblock/index.markdown"> markdown 文件</a>。下面是简单的摘录。</p>
+
+<ul>
+<li><p>语法</p>
+
+<pre><code> ``` [language] [title] [url] [link text] [linenos:false] [start:#] [mark:#,#-#]
+ code snippet
+ ```
+</code></pre></li>
+<li><p>Basic options</p>
+
+<pre><code> [language] - Used by the syntax highlighter. Passing 'plain' disables highlighting.
+ [title] - Add a figcaption to your code block.
+ [url] - Download or reference link for your code.
+ [Link text] - Text for the link, defaults to 'link'.
+</code></pre></li>
+<li><p>源码</p>
+
+<pre><code> ``` ruby Discover if a number is prime http://www.noulakaz.net/weblog/2007/03/18/a-regular-expression-to-check-for-prime-numbers/ Source Article
+ class Fixnum
+   def prime?
+     ('1' * self) !~ /^1?$|^(11+?)\1+$/
+   end
+  end
+ ```
+</code></pre></li>
+<li>显示效果</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>Discover if a number is prime </span><a href='http://www.noulakaz.net/weblog/2007/03/18/a-regular-expression-to-check-for-prime-numbers/'>Source Article</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Fixnum</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">prime?</span>
+</span><span class='line'>    <span class="p">(</span><span class="s1">&#39;1&#39;</span> <span class="o">*</span> <span class="nb">self</span><span class="p">)</span> <span class="o">!~</span> <span class="sr">/^1?$|^(11+?)\1+$/</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>注意事项</h3>
+
+<p>   指定高亮的代码的语言时要写清楚，shell 脚本的语言类型是 <code>sh</code>，即使是 <code>Bash</code> 的脚本也应该用 <code>sh</code>，写作 <code>bash</code> 在  <code>rake generate</code> 的阶段会报错的。</p>
+
+<h3>高亮代码展示</h3>
+
+<figure class='code'><figcaption><span>shell 命令行</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># 升级源，并更新系统</span>
+</span><span class='line'><span class="nv">$ </span>sduo apt-get update <span class="o">&amp;&amp;</span> sudo apt-get upgrade
+</span><span class='line'><span class="c"># 得到系统的内核信息</span>
+</span><span class='line'><span class="nv">$ </span>uname -a
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>c++ 代码</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="cp">#include &lt;iostream&gt;  </span>
+</span><span class='line'><span class="cp">#include &lt;algorithm&gt;  </span>
+</span><span class='line'><span class="cp">#include &lt;string&gt;  </span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="n">main</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>   <span class="n">string</span> <span class="n">str1</span><span class="p">;</span>
+</span><span class='line'>   <span class="n">string</span> <span class="n">str2</span><span class="p">;</span>
+</span><span class='line'>   <span class="k">while</span><span class="p">(</span><span class="n">cin</span><span class="o">&gt;&gt;</span><span class="n">str1</span><span class="o">&gt;&gt;</span><span class="n">str2</span><span class="p">)</span>
+</span><span class='line'>   <span class="p">{</span>
+</span><span class='line'>       <span class="kt">int</span> <span class="n">nLen1</span><span class="p">,</span> <span class="n">nLen2</span><span class="p">,</span> <span class="n">nLen</span><span class="p">;</span>
+</span><span class='line'>       <span class="n">nLen1</span> <span class="o">=</span> <span class="n">str1</span><span class="p">.</span><span class="n">length</span><span class="p">();</span>
+</span><span class='line'>       <span class="n">nLen2</span> <span class="o">=</span> <span class="n">str2</span><span class="p">.</span><span class="n">length</span><span class="p">();</span>
+</span><span class='line'>       <span class="n">nLen</span> <span class="o">=</span> <span class="n">nLen1</span> <span class="o">&gt;</span> <span class="n">nLen2</span> <span class="o">?</span> <span class="n">nLen1</span> <span class="o">:</span> <span class="n">nLen2</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>       <span class="n">reverse</span><span class="p">(</span><span class="n">str1</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">str1</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+</span><span class='line'>       <span class="n">reverse</span><span class="p">(</span><span class="n">str2</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">str2</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+</span><span class='line'>
+</span><span class='line'>       <span class="c1">//高位补零  </span>
+</span><span class='line'>       <span class="k">if</span> <span class="p">(</span><span class="n">nLen</span> <span class="o">&gt;</span> <span class="n">nLen1</span><span class="p">)</span> <span class="n">str1</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">nLen</span> <span class="o">-</span> <span class="n">nLen1</span><span class="p">,</span> <span class="sc">&#39;0&#39;</span><span class="p">);</span>
+</span><span class='line'>       <span class="k">if</span> <span class="p">(</span><span class="n">nLen</span> <span class="o">&gt;</span> <span class="n">nLen2</span><span class="p">)</span> <span class="n">str2</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">nLen</span> <span class="o">-</span> <span class="n">nLen2</span><span class="p">,</span> <span class="sc">&#39;0&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>       <span class="kt">int</span> <span class="n">temp</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>   <span class="c1">//进位数目  </span>
+</span><span class='line'>       <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>       <span class="n">string</span> <span class="n">strResult</span><span class="p">;</span>    <span class="c1">//存储结果  </span>
+</span><span class='line'>
+</span><span class='line'>       <span class="k">while</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">nLen</span><span class="p">)</span>
+</span><span class='line'>       <span class="p">{</span>
+</span><span class='line'>           <span class="k">if</span><span class="p">(</span><span class="n">str1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span><span class="mh">0x30</span> <span class="o">+</span> <span class="n">str2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">temp</span> <span class="o">&gt;</span> <span class="sc">&#39;9&#39;</span><span class="p">)</span>
+</span><span class='line'>           <span class="p">{</span>
+</span><span class='line'>               <span class="n">strResult</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">str1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">str2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="sc">&#39;9&#39;</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">temp</span><span class="p">);</span>
+</span><span class='line'>               <span class="n">temp</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>           <span class="p">}</span>
+</span><span class='line'>           <span class="k">else</span>
+</span><span class='line'>           <span class="p">{</span>
+</span><span class='line'>               <span class="n">strResult</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">str1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">str2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="sc">&#39;0&#39;</span> <span class="o">+</span> <span class="n">temp</span><span class="p">);</span>
+</span><span class='line'>               <span class="n">temp</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>           <span class="p">}</span>
+</span><span class='line'>           <span class="n">i</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>       <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>       <span class="k">if</span><span class="p">(</span><span class="n">temp</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>          <span class="n">strResult</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sc">&#39;1&#39;</span><span class="p">);</span>
+</span><span class='line'>       <span class="n">reverse</span><span class="p">(</span><span class="n">strResult</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">strResult</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+</span><span class='line'>       <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">strResult</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>   <span class="p">}</span>
+</span><span class='line'>   <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[在LNMP环境下安装wordpress]]></title>
+    <link href="http://tingxueren.github.com/blog/2012/11/02/zai-lnmphuan-jing-xia-an-zhuang-wordpress/"/>
+    <updated>2012-11-02T20:36:00+08:00</updated>
+    <id>http://tingxueren.github.com/blog/2012/11/02/zai-lnmphuan-jing-xia-an-zhuang-wordpress</id>
+    <content type="html"><![CDATA[<p>买了vps后感觉总是让它在空跑很浪费资源的感觉，前期在上面安装了openvpn和ssh只
+用来翻墙，看到负载常常是0.00真的很郁闷。将github.com上以前用octopress生成的
+blog放上去，负载基本上还是零，郁闷了，准备捣鼓wordpress了。</p>
+
+<h2>安装wordpress</h2>
+
+<p>本来以为安装起来很麻烦，但是看了下教程竟然如此的简单。wordpress 需要php环境
+和mysql，现在想起来网上卖的虚拟主机是什么东西了。就是分配一块磁盘空间，给客
+建立个mysql帐号，大不了再给个ftp帐号，就这样就拿来卖了，相当的简单。还是vps
+自由度高，想怎么折腾就怎么折腾。</p>
+
+<p>vps上现在安装的是LNMP的一键安装包0.9版，有php和mysql环境，安装wordpress的环
+境要求得到了满足。只需要以root权限运行 /vhost.sh 的脚本添加个新的网站，比如
+myblog.com 就会在 /home/wwwroot/ 文件夹下生成网站的文件夹：myblog.com
+以下的操作都会在这个文件夹进行。</p>
+
+<pre><code>    #下载wordpress中文包 
+    $wget http://cn.wordpress.org/wordpress-3.4.2-zh_CN.tar.gz
+    #解压到本地
+    $tar xzvf wordpress-3.4.2-zh_CN.tar.gz -C myblog.com
+    #将文件转移到myblog.com
+    $cp wordpress/* .
+    $rm -rf wordpress
+</code></pre>
+
+<p>现在还需要个mysql帐号就好了，登陆phpadmin为blog专门建立个帐号，权限配置暂时
+没搞清楚，除了管理权限什么都给了，应该有点多，以后搞懂后再修改吧，现在先用
+着。然后访问域名 www.myblog.com 就会看到 wordpress 的欢迎页面，创建你的帐号
+就可以用了。</p>
+
+<h2>wordpress 调整</h2>
+
+<p>一直对wordpress的可折腾性抱有很高的期望，在网上看到各种不同风格的wordpress
+网站一直搞不懂是怎么做出来的。进入后台明白了，主要归功于wordpress的架构，可
+以随心所欲的更换主题和添加插件。而且大部分的布局还可以自己调整，就是这种灵
+活性造就了同样的架构，表现起来却千变万化。只要耐心，能折腾自己也能搞不独一
+无二的blog。</p>
+
+<h3>wordpress 主题</h3>
+
+<p>主题还是比较容易更换的，在仪表盘上直接有主题的选项，点击安装新的主题即可，
+比较郁闷的是我的wordpress不管安装了多少个主题，当前可用主题一直只有当前主题
+其他的都不见了，最后搜索了原来是 LNMP 安装包的 php 设置的问题，修改下配置就
+好了，可以看另一篇博文。</p>
+
+<h3>wordpress 代码高亮显示</h3>
+
+<p>作为未来的程序猿，免不了要在blog里贴点代码什么的，用 octopress 的时候，编辑
+文章是自己写 Markdown 文档，只要按照规定的格式写就能自动的转化成不错的 html
+代码，wordpress 是需要插件的，就是这个插件折腾的我都要崩溃了。</p>
+
+<ul>
+<li><p>网上推荐的是用的WP-Syntax，具体的使用可以参看这篇<a href="http://www.boke8.net/wordpress-wp-syntax-plugin.html">文章</a>, 还有一个button可以方便的在可视化状态
+下插入代码。这个插件最郁闷的地方是插入代码必须在html视图下插入，但是转到可
+视化的视图查看后再转回来就常常造成html代码混乱了，无法正常的代码高亮。开始
+的时候插件工作的还很正常，但是经过几次实验后就彻底的罢工了，怎么也搞不成代
+高亮了。</p></li>
+<li><p>我的替代方案是用SyntaxHighlighter，简要介绍在<a href="http://codeup.org/archives/128">这里</a>。这个方案的特点是使用够简单，而且不需要在不同的视图之间转换。比
+如添加 c++ 代码，只需要在可视化视图下[cpp] your code [/cpp] 即可，相当的
+方便。</p></li>
+<li><p>现在用的代码高亮的插件用起来还不错，不过有点很郁闷，wordpress 会自动的删
+除 tab 的空白。本来本地的代码，用 tab 缩进的好好的，但是贴在 wordpress 就
+会因为把 tab 缩进删除导致了漂亮的代码看起来惨不忍睹。解决方案有2种，一种是
+自己手动添加空格，不用 tab 缩进，但是工程量很大；另一个方案是用万能的vim，
+强大的vim竟然有直接将当前代码生成 html 的命令，确实强大到让人无语，这里有
+简要的<a href="http://openwares.net/vim/vim_wordpress_syntax.html">介绍</a>。这里是
+<a href="http://www.mars.tingxueren.com/index.php/2012/11/01/%E4%BB%A3%E7%A0%81%EF%BC%8C%E5%BA%94%E7%94%A8vim-vim-%E5%91%BD%E4%BB%A4-tohtml/">效果</a>。 但是对
+与 html 的代码无任何了解，vim 直接生成的代码贴上去后整个页面就无法编辑了,
+如果编辑的话会产生莫名奇妙的错误，等以后了解了 html 后再用 vim 生成的代码
+了。</p></li>
+</ul>
+
+
+<h3>虾米音乐插件</h3>
+
+<p> 用了wordpress发现它的插件是很强大的，因为的有php的网页，动态交互什么的也
+ 不在话下。在网页中插个播放器什么的比 octopress 的话方便很多。我用的是个
+ <a href="http://www.appinn.com/tinymce-xiami-music/">TinyMCE Xiami Music for WordPress</a>, 直接抓取虾米的音乐放在页面，挺不错的。</p>
+
+<h3>关于图片和媒体及版本控制</h3>
+
+<p> 用了一段 wordpress 后我总算是明白了mysql数据库是干什么的，插入的媒体，图片
+ 什么的都会存储在 mysql 数据库中，可以方便的在文章中插入，这点在 Markdown
+ 中插入图片方便。同时 mysql 数据库还保留了同一篇文章你不同时间修改的版本，
+ 当你发现当前的版本不合适时可以很容易的恢复到历史版本。</p>
+
+<p>wordpress 的强大功能还有待发掘，就这么短短的试用时间来说还是不错的，基本上
+比较满意。以后 wordpress 的 blog 主要放图片比较多的文章，毕竟 wordpress 插
+入媒体比较方便，octopress 的 blog 适合随手写的东西，毕竟在本地 vim 中码点字
+比用 wordpress 的在线编辑器体验好很多。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[折腾vps手记]]></title>
+    <link href="http://tingxueren.github.com/blog/2012/10/20/zhe-teng-vpsshou-ji/"/>
+    <updated>2012-10-20T18:55:00+08:00</updated>
+    <id>http://tingxueren.github.com/blog/2012/10/20/zhe-teng-vpsshou-ji</id>
+    <content type="html"><![CDATA[<p>前几天闲逛网页发现了个网站上介绍的一个美国 vps 首月免费，兴冲冲的去注册，把玩了一个下午。环境什么都配置好的时候突然发现登陆不上了，然后就收到了邮件，只提供 3 个小时的免费试用时间，然后我的 vps 就被删除了。靠他大爷的，郁闷了，气的都要吐血了。</p>
+
+<p>一怒之下准备花钱买个 vps 好好玩玩的，linode 是首选，但是因为是穷学生，没米，而且也没有信用卡，玩不起啊。正好逛逛 G+ 发现有人买了个日本的 vps， 配置还可以，关键是还很便宜，很对胃口，还支持支付宝，真是大大的良心啊。下单，买了一个，5 分钟后就可以 ssh 登陆了，确实很快速。</p>
+
+<p>vps 配置还可以，虽然是 openVZ 的架构，但是保证有 512M 的内存，最大 1G 的内存, 10G 硬盘，100M 网络，流量限，感觉基本上够用了。只要 490 日元， 淘宝支付 39 大洋，还是挺好的，延迟也能接受，实验室基本上是 100ms， 宿舍的话 200ms，都能接受。</p>
+
+<h2>初始化配置</h2>
+
+<p>vps 开通后，就要开始进行配置了。我选择的系统是 ubuntu 10.04, 毕竟用 ubuntu 桌面版很长一段时间了，前几个月也在实验室的旧机器配置过 ubuntu server ，我相信这个系统我还是能搞定的。拿到 vps 的时候想把它升级到 12.04, 换日本的源，然后升级，最后升级完成后重启 vps 一直卡死了。没有办法只得到网页的控制面板将 vps 重置了。查找了下资料发现 openVZ 的内核和 host 的内核要一样的，如果服务商不支持高版本的系统的话 vps 是不能升级到高版本的，那就这样吧，10.04 继续用吧。</p>
+
+<ul>
+<li>新建帐号</li>
+</ul>
+
+
+<p>vps 开通的时候只有 root 帐号，一直用 root 帐号的话会不安全的，也没有必要，首先就要建立自己的常用帐号。可以使用以下命令：</p>
+
+<pre><code>    # 建立 you_name 帐号，并加入 sudo 组    
+    # useradd  -G sudo -m -s /bin/bash   you_name
+
+    # 设置密码
+    # passwd you_name   
+
+    # 加入 adm 组，阅读系统 log
+    # usermod -G adm -a you_name
+</code></pre>
+
+<p>这样就建立了个有管理员权限的帐号，一般可以用这个帐号管理 vps，而不需要用
+root 帐号。</p>
+
+<ul>
+<li>修改时区别和locale设置</li>
+</ul>
+
+
+<p>由于 vps 所在地是日本，时区为东九区，vps 的时间比我们的本地时间快了 1 个小时，看起来很不爽，修改时区还是很简单的，执行下述命令就好。</p>
+
+<pre><code>    $ sudo dpkg-reconfigure tzdata
+    # 选择 Asia/Shanghai 一切 ok
+</code></pre>
+
+<p>同样，因为是日本的服务器，locale 设置的不对，执行命令时常常会出现下面的报错
+提示:</p>
+
+<pre><code>    perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+</code></pre>
+
+<p>因为是服务器，en_US.utf8 才是王道，下面就来安装 en_US.utf8:</p>
+
+<pre><code>    root@ubuntu-vps:~# cd /usr/share/locales
+    root@ubuntu-vps:/usr/share/locales# ls
+    install-language-pack  remove-language-pack
+    root@ubuntu-vps:/usr/share/locales# ./install-language-pack en_US
+    Generating locales...
+      en_US.UTF-8... done
+      Generation complete.
+</code></pre>
+
+<p>执行 locale 看安装是否成功:</p>
+
+<pre><code>    roots@ubuntu-vps:~# locale
+LANG=en_US.UTF-8
+LANGUAGE=en_US:en
+LC_CTYPE="en_US.UTF-8"
+LC_NUMERIC=en_US.UTF-8
+LC_TIME=en_US.UTF-8
+LC_COLLATE="en_US.UTF-8"
+LC_MONETARY=en_US.UTF-8
+LC_MESSAGES="en_US.UTF-8"
+LC_PAPER=en_US.UTF-8
+LC_NAME=en_US.UTF-8
+LC_ADDRESS=en_US.UTF-8
+LC_TELEPHONE=en_US.UTF-8
+LC_MEASUREMENT=en_US.UTF-8
+LC_IDENTIFICATION=en_US.UTF-8
+LC_ALL=
+</code></pre>
+
+<p>最后还要执行 update-locale 命令，否则在 /var/log/auth.log 中会出现
+“pam_env can&#8217;t open /etc/default/locale &#8221; 的错误。</p>
+
+<ul>
+<li>修改 ssh 设置，增强安全性</li>
+</ul>
+
+
+<p>ssh 基本是我们管理 vps 的最好的手段了，保护好 ssh 的连接对增强 vps 的安全性有重大的作用。可以从三个方面入手，一个是修改 ssh 默认的 22 端口到自定义端口；其二是禁止远程 root 登陆；其三是禁止密码登陆，只用密钥登陆。基本上是修改
+ssh 的配置文件，下面是具体步骤。</p>
+
+<ol>
+<li><p>修改 ssh port ，禁止 root 远程登陆</p>
+
+<pre><code> # 修改 ssh 配置文件，在文件中修改下面选项
+ sudo vi /etc/ssh/sshd_config
+ # 修改 ssh port， 先增加个端口，重启 ssh 成功后再把默认端口
+ # 删除，防止发生不能ssh登陆的悲剧
+ port ***
+ # 禁止 root 登陆
+ PermitRootLogin no
+ # 重启 ssh 服务
+ sudo service ssh restart
+</code></pre></li>
+<li><p>设置密钥登录</p>
+
+<pre><code> # 本地生成密钥，在本机 .ssh 目录下运行下面的命令
+ # 密钥名可以自定义，如默认的id_rsa
+ ssh-keygen
+ # 拷贝公钥到 vps
+ scp ~/.ssh/id_rsa.pub example_user@vps_ip
+ # vps 上建立 .ssh 目录
+ mkdir .ssh
+ # 拷贝并重命名公钥 
+ mv id_rsa.pub .ssh/authorized_keys
+ # 增强公钥的安全性
+ chown -R example_user:example_user .ssh
+ chmod 700 .ssh
+ chmod 600 .ssh/authorized_keys
+
+ # 测试
+ $ ssh -p port -i .ssh/id_rsa example_user@vps_ip
+ # 如果成功可以禁止密码登陆
+ sudo vi /etc/ssh/sshd_config
+ PasswordAuthentication no
+ # 重启 ssh  
+ sudo service ssh restart
+</code></pre></li>
+<li><p>修改主机名称</p></li>
+</ol>
+
+
+<p>vps 的默认主机名称是一段数值，看起来很不爽，准备修改成自己喜欢的名字</p>
+
+<pre><code>    # 修改 /etc/hosts
+    127.0.1.1    oldname
+    替换为
+    127.0.1.1    newname
+    # 编辑 /etc/hostname
+    $ sudo echo "newname" &gt; /etc/hostname
+    # 运行下面命令
+    $ sudo hostname newname
+    # 必要时可能要重启机器
+</code></pre>
+
+<h2>安装 LNMP 环境</h2>
+
+<p>LNMP一键安装包是一个用Linux Shell编写的可以为CentOS/RadHat、Debian/Ubuntu
+VPS(VDS)或独立主机安装LNMP(Nginx、MySQL、PHP、phpMyAdmin)生产环境的Shell程序。</p>
+
+<p>具体步骤可以参考 <a href="http://lnmp.org/">lnmp.org</a> 的介绍。
+安装时间比较长，需要耐心等待。</p>
+
+<h2>安装 openvpn</h2>
+
+<p>在这个 GFW 猖狂的年代，vpn 已经成为了上网的必备工具，有了 vps 后在上面安装
+好了 vpn 就可以享受无阻碍的网络，还省了购买 vpn 的钱。在 vps 上安装 openvpn
+网上有很多不错的教程，我主要参考了以下的教程设置的。</p>
+
+<p>教程1：<a href="http://www.vpser.net/build/linode-install-openvpn.html">Linode VPS OpenVPN安装配置教程</a>
+教程2：<a href="http://www.douban.com/note/97996409/">OpenVZ vps下的openvpn安装</a></p>
+
+<pre><code>特别注意的是，因为是 openVZ 的 vps 要用DST NAT
+iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -j SNAT --to vps_ip
+</code></pre>
+
+<p>基本上按照上述的教程即可安装好 openvpn。</p>
+
+<h2>设置 iptables</h2>
+
+<p>iptables 是 linux 的防火墙，为了 vps 的安全必须按照一定的规则过滤进出 vps 的
+数据，准许必要的端口开放，关掉非必要的端口，减少被攻击的可能性。一般来说开放
+ssh，ftp，http，https，mysql，openvpn 的端口即可，这个是我的 iptables 设置的<a href="http://tingxueren.github.com/codes/iptables_init.sh">脚本</a>。</p>
+
+<h2>参考资料</h2>
+
+<ol>
+<li><a href="http://library.linode.com/">library.linode.com</a></li>
+<li><a href="http://blog.chinaunix.net/uid-27029423-id-3328463.html">openvpn_server参数详解</a></li>
+<li><a href="%E4%BD%BF%E7%94%A8%20OpenVPN%20%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BF%BB%E5%A2%99%E7%9A%84%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3">使用 OpenVPN 服务器翻墙的相关问题解决</a></li>
+<li><a href="http://www.networkvps.com/index.php/archives/1135">Iptables 设置脚本一例</a></li>
+<li><a href="http://www.zrblog.net/2284.html">VPS简单性能测试命令</a></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[install dropbox in linux]]></title>
+    <link href="http://tingxueren.github.com/blog/2012/09/10/install-dropbox-in-linux/"/>
+    <updated>2012-09-10T20:49:00+08:00</updated>
+    <id>http://tingxueren.github.com/blog/2012/09/10/install-dropbox-in-linux</id>
+    <content type="html"><![CDATA[<p>Dropbox 是个很神奇的工具，你可以用它来同步重要的文件，配置。可以放心的把文件放在云端，作为备份。Dropbox 有着齐全的平台覆盖，不但有 windows客户端，MAC 客户端，还有 ios 客户端，Android 客户端，最让我高兴的是还有 Linux 客户端，这点让我十分的欣赏。Dropbox 真正的实现了全平台覆盖，在不同的平台上都给人一致的体验。</p>
+
+<h2>Dropbox 的安装</h2>
+
+<p>天朝是个神奇的地方，基本上好的互联网服务都会被 #GFW 认证。可以说被 #GFW 认证的服务才是靠谱和真正有价值的服务。</p>
+
+<p>为了能正常的使用 Dropbox 请认真学习各种翻墙技能，常常温故知新，多准备些备用手段，以便应付 #GFW 层出不穷的攻击手段。推荐的梯子有 VPN、SSH、GAE（GoAgent，Wallproxy）等等。</p>
+
+<ul>
+<li><p>为了使用 Dropbox，必须先有个帐号，Dropbox 主页被墙，请自备梯子。客户端
+暂时还能正常的使用，但是有个问题，在两台电脑之间无法即时同步，因为提供即
+时同步功能的服务器与客户端用的是 http 协议，被 #GFW 干扰。但是重新关闭客
+户端后即可正常同步，天朝威武，把好好的自动工具搞成了半自动。</p></li>
+<li><p>在主页上有 Dropbox 软件下载, Windows 下客户端是一个单一个软件，Linux
+下却会给人带来点小麻烦。</p></li>
+<li><p>在 ubuntu 下软件中心有 Dropbox，但是安装后会有以下的画面：</p></li>
+<li><p><img src="http://tingxueren.github.com/images/dropbox-error.png" title="dropbox error" alt="" /></p>
+
+<p>原因是软件中心的 Dropbox 只是个 nautilus 插件，由它整合 Dropbox 和 nautilus
+本身并不是完整的客户端，需要从 Dropbox 官网下载完整的安装包。</p></li>
+<li><p>然后在下载的安装包的过程中，你会发现安装进程像卡死一样一动不同。
+不用怀疑，是 #GFW 发威了，它阻断了你与 Dropbox 官网的连接，为了正常的用 Dropbox，
+我们需要手动安装客户端。</p></li>
+<li><p>令人高兴的是 Dropbox 提供了安装包的完整的下载版本，可以在<a href="https://www.dropbox.com/install?os=lnx">Dropbox官网</a>查看。</p></li>
+<li><p>下载安装有两种方式，一种是从浏览器下载，然后解压，执行; 另一种是自己在终
+端中执行所有的操作。</p></li>
+<li><p>翻墙方式首选 VPN ，然后终端中的命令可以顺利的执行，如果是用 GoAgent 等
+工具的话需要在执行前设置终端的代理，让终端接下来的操作都通过代理进行，
+即通过代理下载安装包，由于安装软件需要 root 权限，切记在设置代理前，切换
+为 root 用户，下面 GoAgent 为例说明设置（8087为GoAgent默认端口）。</p>
+
+<pre><code> export http_proxy=http://127.0.0.1:8087   
+ export https_proxy=http://127.0.0.1:8087   
+</code></pre></li>
+<li><p>然后在终端中执行下面命令以完成安装：</p>
+
+<pre><code> # 32 位系统执行下面命令
+ $cd ~ &amp;&amp; wget -O - "https://www.dropbox.com/download?plat=lnx.x86" | tar xzf -
+
+ # 64 位系统执行下面命令
+ $cd ~ &amp;&amp; wget -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
+</code></pre></li>
+<li><p>最后执行下面的命令</p>
+
+<pre><code> $ ~/.dropbox-dist/dropboxd
+</code></pre></li>
+</ul>
+
+
+<p>Dropbox 安装顺利完成，享受全平台同步的快感吧。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[shell脚本分享]]></title>
+    <link href="http://tingxueren.github.com/blog/2012/08/07/shelljiao-ben-fen-xiang/"/>
+    <updated>2012-08-07T21:26:00+08:00</updated>
+    <id>http://tingxueren.github.com/blog/2012/08/07/shelljiao-ben-fen-xiang</id>
+    <content type="html"><![CDATA[<p>用着 linux 免不了要和 shell 打交道，shell 是个很强大的工具，内置了多有用的程序，配合着 linux 的管道机制，可以将这些小工具组合成各种各样的脚本，为你服务。下面简单的介绍并分享我的几个小脚本。</p>
+
+<h2>脚本的结构</h2>
+
+<ul>
+<li><p>脚本的第一行一般是 <code>#!/bin/bash</code> 或者是 <code>#!/bin/sh</code>, 表明执行脚本的程序为
+<code>bash</code> 或者是 <code>sh</code> 。</p></li>
+<li><p>以 <code>#</code> 开头的为注释，执行时会自动忽略。</p></li>
+<li><p>脚本在执行时可以从外界获取参数，一般执行脚本的格式为 <code>test.sh arg[1] arg[2] ...</code> , 在脚本内部 <code>$0</code> 代表脚本的名称， <code>$1</code> 代表第一个参数，以此类推。</p></li>
+<li><p>脚本中常用的命令</p>
+
+<ul>
+<li><p>find 和 exec</p>
+
+<pre><code># 一般用 find 命令找到符合要求的项目，然后调用 command 处理每一项
+find path [-type] [f]  [-name] ["*.txt"]  -exec command argument '{}' \;
+</code></pre></li>
+<li><p>sed awk cut</p>
+
+<pre><code># 这三个一般都是用来对获取的文本进行处理
+# 获取文件扩展名, 即如果输入为test.txt, 输出为txt
+sed 's/^.*\.//g'
+# 输出 ps aux 的输出项的前两列
+ps aux | awk '{print $1, $2}' 
+# cut 即剪切工具，下面是取出以空格为分隔符，取出第一部分的命令
+cut -d ' '  -f 1   
+</code></pre></li>
+</ul>
+</li>
+</ul>
+
+
+<h2>我的小脚本</h2>
+
+<ul>
+<li><p><a href="http://tingxueren.github.com/codes/iconv_shell.sh">文本格式转换脚本</a></p>
+
+<p>用 linux 有一个很头疼的问题就就是中文的乱码问题，linux 下中文的编码格式是
+utf-8, windows 默认编码格式是 GB2312， 这导致了 windows 下的文本文件在
+linux 下常常是乱码的，同理 linux 下编辑的文本文件在 windows 下也会乱码。
+为此我们要进行字符编码的转换，即利用 <code>iconv</code> 命令。<code>iconv</code> 命令的基本格式
+如下：</p>
+
+<pre><code>  iconv -f oldcharset -t newcharset  file -o newfile 
+</code></pre>
+
+<p>脚本实现了自动获取字符编码，并转换为 UTF-8 编码的功能，为了解决常常遇到的
+未知编码问题，加入了个默认功能，如果编码未知，强制性的进行 GB18030 到
+UTF-8 的功能，运行起来效果还好。根据这个又修改成了一个右键调用的
+<a href="http://tingxueren.github.com/codes/UTF8.sh">nautilus-script</a>。</p></li>
+<li><p><a href="http://tingxueren.github.com/codes/chmod_recursion.sh">批量更改文件权限脚本</a></p>
+
+<p>在拷贝文件时常常遇到拷贝回来的文件的权限不对，一个个更改很麻烦，
+脚本主要用<code>find</code>命令查找对应的项目，然后通过 <code>exec</code> 调用 <code>chmod</code>
+而成，具体请看脚本。</p></li>
+<li><p><a href="http://tingxueren.github.com/codes/chown_recursion.sh">批量更改文件所有者脚本</a></p>
+
+<p>和上面的脚本很相似，也是用 <code>find</code>, <code>exec</code>, <code>chown</code>,组合而成，
+<code>chown</code>可以同时更改文件的所有者和所属组。</p></li>
+<li><p><a href="http://tingxueren.github.com/codes/mod-file-extension.sh">更改文件后缀名</a></p>
+
+<p>有时候文件的后缀名不符合要求，如要把 <code>htm</code> 后缀换成 <code>html</code> 后缀，这个脚本
+就很有用。主要用到了一个命令 <code>rename</code>。</p>
+
+<pre><code>  # 将说用的 *.htm 后缀换成 html
+  renam 's/htm$/html' *.htm
+</code></pre></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[new blog with octopress]]></title>
+    <link href="http://tingxueren.github.com/blog/2012/08/05/new-blog-with-octopress/"/>
+    <updated>2012-08-05T11:52:00+08:00</updated>
+    <id>http://tingxueren.github.com/blog/2012/08/05/new-blog-with-octopress</id>
+    <content type="html"><![CDATA[<h2>新的 blog</h2>
+
+<p>对前几天建立的 blog ，基于 jekyllbootstrap 感到不爽，就换了个模板，即</p>
+
+<p>基于 Octopress, 感觉这个配色还有配置我挺喜欢的。都是基于 jekyll 的，但是</p>
+
+<p>Octopress 要求的更多，操作起来更复杂些。要求 Ruby 1.9.3 的支持，还有安装</p>
+
+<p>一大堆的 gem, 不过还好，效果蛮不错的，暂时就先这样了。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[早安，世界]]></title>
+    <link href="http://tingxueren.github.com/blog/2012/08/05/zao-an-%2Cshi-jie/"/>
+    <updated>2012-08-05T10:10:00+08:00</updated>
+    <id>http://tingxueren.github.com/blog/2012/08/05/zao-an-,shi-jie</id>
+    <content type="html"><![CDATA[<h2>中文的题目貌似也可以</h2>
+
+<p>就是题目被自动的转化为拼音，看起来有点蛋疼。</p>
+
+<p>继续测试下列表</p>
+
+<ul>
+<li><p>列表1</p>
+
+<p>  sudo poweroff</p></li>
+<li><p>列表2</p>
+
+<pre><code>  sudo apt-get upgrade
+</code></pre></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[hellow world]]></title>
+    <link href="http://tingxueren.github.com/blog/2012/08/05/hellow-world/"/>
+    <updated>2012-08-05T09:32:00+08:00</updated>
+    <id>http://tingxueren.github.com/blog/2012/08/05/hellow-world</id>
+    <content type="html"><![CDATA[<h2>小测试</h2>
+
+<ul>
+<li><p>列表1</p></li>
+<li><p>列表2</p>
+
+<ul>
+<li><p>二级列表1</p></li>
+<li><p>二级列表2</p></li>
+</ul>
+</li>
+<li><p>列表3</p>
+
+<pre><code>  sudo apt-get install ruby
+</code></pre></li>
+</ul>
+
+
+<h3>测试的一天</h3>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[git note]]></title>
+    <link href="http://tingxueren.github.com/blog/2012/08/04/git-note/"/>
+    <updated>2012-08-04T00:00:00+08:00</updated>
+    <id>http://tingxueren.github.com/blog/2012/08/04/git-note</id>
+    <content type="html"><![CDATA[<p>最近一段时间学习Git，并在github上注册了帐号，上传了一些自己写的玩具代码，在github上搭建了自己的blog。发现Git是个挺强大的工具，写点笔记以免遗忘。</p>
+
+<p><img src="http://tingxueren.github.com/images/favicon.ico" title="favicon" alt="" /></p>
+
+<h3>Git和github简要介绍</h3>
+
+<ul>
+<li><p>Git 是一款分布式的版本控制系统，由Linux大神 Linus Torvalds为了维护 kernel 开发的。</p></li>
+<li><p>Git 和以往的版本控制系统最大的不同就体现在它是分布式的，不是集中式的，不必要连接远程版本库，可以在本地进行提交，不依赖网络环境。</p></li>
+<li><p>Git具有很优秀的分支和合并功能，便于团队协作，加快开发进度。</p></li>
+<li><p>github 是个代码托管网站，用Git作为其版本控制工具，很好用，很多流行的应用就托管在上面，托管在上面的项目可以方便的 fork, pull request, issuse, 即Social Coding。</p></li>
+</ul>
+
+
+<h3>Git 基本命令</h3>
+
+<ul>
+<li><p>创建现场版本库，并初始化。</p>
+
+<pre><code>  $ git init
+</code></pre></li>
+<li><p>添加文件并提交，在修改任何文件的时候，必须先 add，然后 commit，不容许空
+commit。</p>
+
+<pre><code>  $ git add filename
+  $ git commit -m "your commit."
+</code></pre></li>
+<li><p>Git checkout 命令，实质上是修改 HEAD 的指向。</p>
+
+<pre><code>  $ git checkout *** # 可以处于分离头指针的状态，Git无法跟踪，回到
+  具体的 branch 要执行 marge 命令。
+</code></pre></li>
+<li><p>Git reset 命令，一直在 HEAD 分支中操作，用指定提交状态的文件替换掉暂存区的文件。</p>
+
+<pre><code>  $ git reset HEAD &lt;paths&gt; # 取消之前的 git add &lt;paths&gt; 命令，
+  即用 HEAD 中的上次 commit 的文件替换暂存区的文件。
+</code></pre></li>
+<li><p>Git stash 命令。用来保存和恢复进度。</p>
+
+<pre><code>  $ git stash # 保存当前工作进度，会对暂存区和工作区的状态进行保存。
+  $ git stash list # 保存进度列表
+  $ git stash pop # 恢复最新的工作进度，并从列表中删除
+  $ git stash apply # 恢复最近的工作进度，但是不从列表中删除
+</code></pre></li>
+<li><p>Git 其他基本命令。</p>
+
+<pre><code>  $ git rm # 删除命令
+  $ git add # 添加命令
+  $ git add -u # 所有改动添加到暂存区
+  $ git add -i # 选择性添加，交互模式
+  $ git mv # 改名
+  $ git cat-file # 和 Linux 中的 cat file 类似
+  $ git rev-parse # 功能很多暂时没搞明白
+</code></pre></li>
+</ul>
+
+
+<h3>Github 相关命令</h3>
+
+<pre><code>    # 本地建立github.com 项目克隆   
+    $ git clone git@github.com:USERNAME/REPOSITORY.git  
+    # 添加远程版本库 
+    $ git remote add origin git@github.com:USERNAME/REPOSITORY.git  
+    $ git push # 上传
+    $ git pull # 下载
+</code></pre>
+
+<h3>Github 建立blog</h3>
+
+<p>在 github.com 上托管 blog，很酷，免费，而且还可以用 git 进行管理。github.com
+上托管的都是静态的网页，一般用 Jekyll 进行维护。项目在GitHub的托管地址：
+http://github.com/mojombo/jekyll/ ，专有的URL地址为：http://jekyllrb.com/。</p>
+
+<p>本 blog 用的是 jekyllbootstrap, URL地址为 http://jekyllbootstrap.com/。建立
+blog 很简单：</p>
+
+<ul>
+<li><p>像普通的项目一样在 github.com 上建立如 USERNAME.github.com 的项目。</p></li>
+<li><p>在本地安装 Jekyll-Bootstrap</p>
+
+<pre><code>  $ git clone https://github.com/plusjade/jekyll-bootstrap.git USERNAME.github.com
+  $ cd USERNAME.github.com
+  $ git remote set-url origin git@github.com:USERNAME/USERNAME.github.com.git
+  $ git push origin master
+</code></pre></li>
+<li><p>安装 Jekyll, 需要 Ruby 支持</p>
+
+<pre><code>  $ gem install jekyll
+  # 如果没有安装 Ruby 和 gem 在 ubuntu 下执行
+  $ sudo apt-get install ruby gem
+  # jekyll 自带的有服务器，启动后访问 http://localhost:4000/ 
+  $ cd USERNAME.github.com 
+  $ jekyll --server
+  # remember to change USERNAME to your GitHub username.
+</code></pre></li>
+<li><p>生成 post</p>
+
+<pre><code>  $ rake post title="your post title"
+  # 生成 time-tittle.md 的文档，在 _posts 目录下，无法生成
+  # 带中文的目录，如果想用中文的可以手动修改。
+  # 文档为 *.md 是 Markdown 标记语言解析的，比较简单。
+</code></pre></li>
+<li><p>push 到 github.com</p>
+
+<pre><code>  $ git push
+</code></pre></li>
+</ul>
+
+
+<h3>参考资料</h3>
+
+<ol>
+<li><a href="http://www.worldhello.net/gotgit/">Git 权威指南</a></li>
+<li><a href="http://www.worldhello.net/gotgithub/">GotGitHub</a></li>
+<li><a href="http://jekyllbootstrap.com/">jekyllbootstrap</a></li>
+<li><a href="http://sixpoint.github.com/">sixpoint&#8217;s blog</a></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ubuntu开启打印机服务]]></title>
+    <link href="http://tingxueren.github.com/blog/2012/08/03/ubuntu-printer/"/>
+    <updated>2012-08-03T22:32:00+08:00</updated>
+    <id>http://tingxueren.github.com/blog/2012/08/03/ubuntu-printer</id>
+    <content type="html"><![CDATA[<h2>目的</h2>
+
+<p>局域网中有空闲的打印机，可以做成打印机服务器，局域网中的用户添加网络打印机就可以自由的使用，方便，且节省资源，达到了设备充分利用的效果。</p>
+
+<h3>软硬件情况</h3>
+
+<ul>
+<li>服务器: 运行着ubuntu11.10 x64系统，现在运行着NTF，FTP，PT下载，迅雷下载等服务。</li>
+<li>打印机: HP LaserJet M1319 Multifunction Printer series, 官方网站提供的有linux驱动。</li>
+<li>客户端: windows, ubuntu, fedora。</li>
+</ul>
+
+
+<h3>具体步骤</h3>
+
+<ul>
+<li><p>第一步: 下载对应版本的linux驱动<a href="http://hplipopensource.com/hplip-web/index.html?">下载地址</a>，
+  选择64位的驱动，访问比较慢。</p></li>
+<li><p>第二步: 在终端中对照着<a href="http://hplipopensource.com/hplip-web/install/install/index.html">安装指南</a>, 一步步安装。在下载驱动的时候，
+  由于驱动托管在sourceforge.net,被墙掉了，请科学上网进行下载。在第13步的时候，还要下载一个插件，由于网络的原因，一直卡死，这时候
+  可以手动取消，把插件下载到本地，然后运行sudo ph-plug 或者是 hp-setup 进行手动安装。驱动安装后，本机测试就可以打印了，网络打印的
+  话需要进一步的设置。</p></li>
+<li><p>第三步: 网络打印需要CUPS，在以前的版本中可以直接安装cpus的软件包，但是最近的ubuntu版本这个包被修改成了cupsys-driver-gutenprint,
+  可以用命令 sudo apt-get install cupsys-driver-gutenprint。安装完成后要对cups服务进行设置，在浏览器中输入http://127.0.0.1:631,
+  可以进入CUPS的设置页面，选Administration，选上Show printers shared by other systems
+  Share published printers connected to this system
+  新版本的还有一个也选上
+  Allow printing from the Internet</p></li>
+<li><p>第四步: CUPS设置完毕后，服务器端已经设置完毕，可以设置客户端了。linux下测试可以添加网络打印机，输入服务器的ip可自动的识别出服务上
+  的打印机，选择下一步就好。windows下首先要安装对应的打印机驱动，然后添加网络打印机，在地址栏目输入的可是如下：
+  http://服务器ip:631/printers/打印机名称
+  linux下如果不识别可以按照下面格式输入
+  ipp://服务器ip:631/printers/打印机名称
+  设置好后都有测试页可供打印。客户端设置完毕。</p></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[use goagent for apt get]]></title>
+    <link href="http://tingxueren.github.com/blog/2012/08/03/use-goagent-for-apt-get/"/>
+    <updated>2012-08-03T00:00:00+08:00</updated>
+    <id>http://tingxueren.github.com/blog/2012/08/03/use-goagent-for-apt-get</id>
+    <content type="html"><![CDATA[<h2>简介</h2>
+
+<p>goagent 干什么用的 我就不说了 安装百度有大把的教程，apt-get 在安装一些软件的话 如果要从国外下载 那么可以考虑使用这种方法，apt-get 设置代理的方法：</p>
+
+<p>root@bt :~# export http_proxy=http://127.0.0.1:8087
+设置完代理 再</p>
+
+<p>root@bt :~# apt-get update &amp;&amp; sudo apt-get install libreoffice</p>
+
+<p>goagent 速度很快，我没使用 下载速度是 2k/s 收不鸟了 代理下后 速度 200k/s .。。</p>
+
+<h3>安装goagent</h3>
+
+<p>apt-get 设置代理的方法具体看下面的文章:</p>
+
+<p>http://blog.163.com/fanning_7213/blog/static/24965052011026104010570/</p>
+
+<p>想安个xchm看CHM的书，由于自己的机子网络有问题，本想自己下个包安装，没想到信赖包太多，最后只得做罢。</p>
+
+<p>自己是通过代理上网的，到网上搜下了这篇文章，直接按第一种方法，然后sudo apt-get update ; sudo apt-get install xchm</p>
+
+<h3>可以通过三种方法为apt-get设置http代理</h3>
+
+<ul>
+<li>方法一: 这是一种临时的手段，如果您仅仅是暂时需要通过http代理使用apt-get，您可以使用这种方式。
+在使用apt-get之前，在终端中输入以下命令（根据您的实际情况替换yourproxyaddress和proxyport）。
+export http_proxy=http://yourproxyaddress:proxyport</li>
+<li>方法二: 这种方法要用到/etc/apt/文件夹下的apt.conf文件。如果您希望apt-get（而不是其他应用程序）一直使用http代理，您可以使用这种方式。
+注意： 某些情况下，系统安装过程中没有建立apt配置文件。下面的操作将视情况修改现有的配置文件或者新建配置文件。
+gksudo gedit /etc/apt/apt.conf
+在您的apt.conf文件中加入下面这行（根据你的实际情况替换yourproxyaddress和proxyport）。
+Acquire::http::Proxy “http://yourproxyaddress:proxyport”;
+保存apt.conf文件。</li>
+<li>方法三: 这种方法会在您的主目录下的.bashrc文件中添加两行。如果您希望apt-get和其他应用程序如wget等都使用http代理，您可以使用这种方式。
+gedit ~/.bashrc
+在您的.bashrc文件末尾添加如下内容（根据你的实际情况替换yourproxyaddress和proxyport）。
+http_proxy=http://yourproxyaddress:proxyport
+export http_proxy
+保存文件。关闭当前终端，然後打开另一个终端。
+
+<h3>测试</h3>
+
+<p>使用apt-get update或者任何您想用的网络工具测试代理。我使用firestarter查看活动的网络连接。
+如果您为了纠正错误而再次修改了配置文件，记得关闭终端并重新打开，否自新的设置不会生效。
+代理服务器的登录
+如果代理服务器需要登录，那么可以在指定代理服务器地址的时候，用如下格式（根据情况把username，password， yourproxyaddress和proxyport替换为相应内容）：
+http_proxy=http://username:password@yourproxyaddress:proxyport</p></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

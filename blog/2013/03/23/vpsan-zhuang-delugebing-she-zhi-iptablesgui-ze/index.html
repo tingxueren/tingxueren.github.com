@@ -1,0 +1,324 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>vps 安装 deluge 并设置 iptables 规则 - Tingxueren's Blog</title>
+	<meta name="author" content="tingxueren">
+
+	
+	<meta name="description" content="昨天 HDC 的下载网站终于恢复了，换了个马甲 hdwing.com 重新开始提供 PT 服务。原有的 HDC 的数据都还在，网站也迁移到了美国感觉靠谱多了，至少不用担心莫名其妙的被拔网线的问题了。登陆后看了下，除了 logo 更换了，其他的都是那么的熟悉，看到了自己的数据都还在，顿时泪流满面。 &hellip;">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Tingxueren's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">Tingxueren's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="http://google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:tingxueren.github.com">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		<a class="google" href="https://plus.google.com/112617278058034597125?rel=author" title="Google+">Google+</a>
+		
+		
+		<a class="twitter" href="http://twitter.com/tingxueren" title="Twitter">Twitter</a>
+		
+		
+		<a class="github" href="https://github.com/tingxueren" title="GitHub">GitHub</a>
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+	</div>
+	<form class="search" action="http://google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:tingxueren.github.com">
+	</form>
+</nav>
+
+</header>
+	
+		
+<div id="banner" class="inner">
+	<div class="container">
+		<ul class="feed"></ul>
+	</div>
+	<small><a href="http://twitter.com/tingxueren">tingxueren</a> @ <a href="http://twitter.com">Twitter</a></small>
+	<div class="loading">Loading...</div>
+</div>
+<script src="/javascripts/twitter.js"></script>
+<script type="text/javascript">
+	(function($){
+		$('#banner').getTwitterFeed('tingxueren', 4, false);
+	})(jQuery);
+</script>
+
+	
+	<div id="content" class="inner"><article class="post">
+	<h1 class="title">Vps 安装 Deluge 并设置 Iptables 规则</h1>
+	<div class="entry-content"><p>昨天 HDC 的下载网站终于恢复了，换了个马甲 <a href="www.hdwing.com">hdwing.com</a> 重新开始提供 PT 服务。原有的 HDC 的数据都还在，网站也迁移到了美国感觉靠谱多了，至少不用担心莫名其妙的被拔网线的问题了。登陆后看了下，除了 logo 更换了，其他的都是那么的熟悉，看到了自己的数据都还在，顿时泪流满面。</p>
+
+<h2>下载工具</h2>
+
+<p>Windows 下没什么挑剔的，用 utorrent 就一切 ok。Linux 却要费一番思量，PT 网站支持的客户端还挺多的，有 ktorrent、rtorrent、transmission 和 deluge 等等。以前一直在用 ubuntu 自带的 transmission, 挺简洁也很小巧，但是悲剧的是从 ubuntu 12.04 起，transmission 升级到了2.77 版，HDC 支持的 transmission 最新也直到了 2.73 版，所以就悲剧了。deluge 貌似支持的到了最新的 1.3.5 版本了，所以就准备安装 deluge 作为下载工具了。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>sudo apt-get install deluged deluge-web
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> 执行上述的命令就安装好了，具体的如何设置的可以参见这篇 <a href="http://sunsea.im/deluge-config.html">blog</a>。</p>
+
+<h2>设置 nginx 代理</h2>
+
+<p>deluge 安装后默认的在 8182 端口打开 web 服务，但是因为 vps 上已经安装上了 LNMP 环境，所以想用 nginx 将 8182 端口映射到 80 端口，减少端口暴露，同时也便于管理。本文参考了 <a href="http://blog.dayanjia.com/2012/12/seedbox-configuration-example/">Seedbox配置实例</a> ,和 <a href="http://forum.deluge-torrent.org/viewtopic.php?f=8&amp;t=39329">deluge forum</a>。</p>
+
+<h3>nginx 文件配置</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>将下列配置写入 nginx 域名配置文件
+</span><span class='line'>server <span class="o">{</span>
+</span><span class='line'>   <span class="c">### server port and name ###</span>
+</span><span class='line'>   listen            0.0.0.0:80;
+</span><span class='line'>   listen            <span class="o">[</span>::<span class="o">]</span>:80;
+</span><span class='line'>   server_name         your.domain.net;
+</span><span class='line'>   <span class="k">if</span> <span class="o">(</span><span class="nv">$host</span> !~* ^<span class="o">(</span>your.domain.net<span class="o">)</span><span class="nv">$ </span><span class="o">)</span> <span class="o">{</span> <span class="k">return </span>444; <span class="o">}</span> <span class="c">#URL non matché par le domaine</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>   <span class="c">### Compression ###</span>
+</span><span class='line'>   gzip            on;
+</span><span class='line'>   gzip_static         on;
+</span><span class='line'>   gzip_buffers         32 8k;
+</span><span class='line'>   gzip_comp_level         3;
+</span><span class='line'>   gzip_http_version      1.1;
+</span><span class='line'>   gzip_types         text/css text/xml application/x-javascript application/atom+xml text/mathml text/plain t
+</span><span class='line'>ext/vnd.sun.j2me.app-descriptor text/vnd.wap.wml text/x-component image/x-ms-bmp image/svg+xml application/msword application/rt
+</span><span class='line'>f application/xml application/xhtml+xml application/xml+rss text/javascript application/javascript application/json;
+</span><span class='line'>   gzip_vary         on;
+</span><span class='line'>
+</span><span class='line'>   location / <span class="o">{</span>
+</span><span class='line'>      proxy_pass      http://localhost:8112/;
+</span><span class='line'>      proxy_next_upstream   error timeout invalid_header http_500 http_502 http_503;
+</span><span class='line'>
+</span><span class='line'>      <span class="c">### Set headers ####</span>
+</span><span class='line'>      proxy_set_header   Host         <span class="nv">$host</span>;
+</span><span class='line'>      proxy_set_header   X-Real-IP      <span class="nv">$remote_addr</span>;
+</span><span class='line'>      proxy_set_header   X-Forwarded-For      <span class="nv">$proxy_add_x_forwarded_for</span>;
+</span><span class='line'>
+</span><span class='line'>      <span class="c">### By default we don&#39;t want to redirect it ####</span>
+</span><span class='line'>      proxy_redirect      off;
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>   location ~*^.+<span class="o">(</span>ico|css|js|gif|jpe?g|png<span class="o">)</span><span class="nv">$ </span><span class="o">{</span>
+</span><span class='line'>                proxy_pass              http://localhost:8112;
+</span><span class='line'>      expires         max;
+</span><span class='line'>
+</span><span class='line'>                proxy_next_upstream     error timeout invalid_header http_500 http_502 http_503;
+</span><span class='line'>
+</span><span class='line'>                <span class="c">### Set headers ####</span>
+</span><span class='line'>                proxy_set_header        Host                    <span class="nv">$host</span>;
+</span><span class='line'>                proxy_set_header        X-Real-IP               <span class="nv">$remote_addr</span>;
+</span><span class='line'>                proxy_set_header        X-Forwarded-For         <span class="nv">$proxy_add_x_forwarded_for</span>;
+</span><span class='line'>
+</span><span class='line'>                <span class="c">### By default we don&#39;t want to redirect it ####</span>
+</span><span class='line'>                proxy_redirect          off;
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>通过上面的设置你可以通过 <code>http://your.domain.net</code> 来管理 deluge，和通过 <code>http:// your-ip:8112</code> 效果一致。</p>
+
+<h2>iptables 设置</h2>
+
+<p>默认的情况 deluge 的 incoming ports 和 outgoing ports 都使用的是 random ports,也就是随机端口，这样无法使用 iptables 控制 vps 的访问，造成很大的安全漏洞。deluge 也提供了端口设置，默认的是 6881 到 6891，但是郁闷的是我将 6881-6891的端口的进出都在 iptables 规则中设置为了 accept，连接 pt 服务器的时候还是会显示 blocked, 来回的折腾，关掉/打开 iptables、重启 deluge、甚至最后重启 vps，都是一样的效果。搞了一下午无任何进展，然后突然我想起来是不是端口被服务商封锁了，将默认的端口从 6881-6891 设置为了 56800-56810,然后就工作正常了，WTF。</p>
+
+<h3>iptables 规则</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>iptables -A INPUT -p TCP --dport 56800:56810 -j ACCEPT
+</span><span class='line'>iptables -A INPUT -p UDP --dport 56800:56810 -j ACCEPT
+</span><span class='line'>iptables -A OUTPUT -p TCP --sport 56800:56810 -j ACCEPT
+</span><span class='line'>iptables -A OUTPUT -p UDP --sport 56800:56810 -j ACCEPT
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>经过了上面的设置，deluge 运行还是比较平稳的，占用的资源不是很多。vps 网速特别给力， 上传高峰可达到 5M/s，真是相当不错, 只是硬盘容量太小很遗憾啊。</p>
+</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-23T15:46:00+08:00" pubdate data-updated="true">Mar 23<span>rd</span>, 2013</time></div>
+	<div class="tags">
+
+</div>
+	
+</div></article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+	<a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+	
+	<a class="addthis_counter addthis_pill_style"></a>
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid="></script>
+</div>
+
+
+
+<section id="comment">
+    <h1 class="title">Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2013
+
+    tingxueren
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'tingxueren';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tingxueren.github.com/blog/2013/03/23/vpsan-zhuang-delugebing-she-zhi-iptablesgui-ze/';
+        var disqus_url = 'http://tingxueren.github.com/blog/2013/03/23/vpsan-zhuang-delugebing-she-zhi-iptablesgui-ze/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-37023627-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,255 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>shell脚本分享 - Tingxueren's Blog</title>
+	<meta name="author" content="tingxueren">
+
+	
+	<meta name="description" content="用着 linux 免不了要和 shell 打交道，shell 是个很强大的工具，内置了多有用的程序，配合着 linux 的管道机制，可以将这些小工具组合成各种各样的脚本，为你服务。下面简单的介绍并分享我的几个小脚本。 脚本的结构 脚本的第一行一般是 #!/bin/bash 或者是 #!/bin/ &hellip;">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Tingxueren's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">Tingxueren's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="http://google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:tingxueren.github.com">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		<a class="google" href="https://plus.google.com/112617278058034597125?rel=author" title="Google+">Google+</a>
+		
+		
+		<a class="twitter" href="http://twitter.com/tingxueren" title="Twitter">Twitter</a>
+		
+		
+		<a class="github" href="https://github.com/tingxueren" title="GitHub">GitHub</a>
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+	</div>
+	<form class="search" action="http://google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:tingxueren.github.com">
+	</form>
+</nav>
+
+</header>
+	
+		
+<div id="banner" class="inner">
+	<div class="container">
+		<ul class="feed"></ul>
+	</div>
+	<small><a href="http://twitter.com/tingxueren">tingxueren</a> @ <a href="http://twitter.com">Twitter</a></small>
+	<div class="loading">Loading...</div>
+</div>
+<script src="/javascripts/twitter.js"></script>
+<script type="text/javascript">
+	(function($){
+		$('#banner').getTwitterFeed('tingxueren', 4, false);
+	})(jQuery);
+</script>
+
+	
+	<div id="content" class="inner"><article class="post">
+	<h1 class="title">Shell脚本分享</h1>
+	<div class="entry-content"><p>用着 linux 免不了要和 shell 打交道，shell 是个很强大的工具，内置了多有用的程序，配合着 linux 的管道机制，可以将这些小工具组合成各种各样的脚本，为你服务。下面简单的介绍并分享我的几个小脚本。</p>
+
+<h2>脚本的结构</h2>
+
+<ul>
+<li><p>脚本的第一行一般是 <code>#!/bin/bash</code> 或者是 <code>#!/bin/sh</code>, 表明执行脚本的程序为
+<code>bash</code> 或者是 <code>sh</code> 。</p></li>
+<li><p>以 <code>#</code> 开头的为注释，执行时会自动忽略。</p></li>
+<li><p>脚本在执行时可以从外界获取参数，一般执行脚本的格式为 <code>test.sh arg[1] arg[2] ...</code> , 在脚本内部 <code>$0</code> 代表脚本的名称， <code>$1</code> 代表第一个参数，以此类推。</p></li>
+<li><p>脚本中常用的命令</p>
+
+<ul>
+<li><p>find 和 exec</p>
+
+<pre><code># 一般用 find 命令找到符合要求的项目，然后调用 command 处理每一项
+find path [-type] [f]  [-name] ["*.txt"]  -exec command argument '{}' \;
+</code></pre></li>
+<li><p>sed awk cut</p>
+
+<pre><code># 这三个一般都是用来对获取的文本进行处理
+# 获取文件扩展名, 即如果输入为test.txt, 输出为txt
+sed 's/^.*\.//g'
+# 输出 ps aux 的输出项的前两列
+ps aux | awk '{print $1, $2}' 
+# cut 即剪切工具，下面是取出以空格为分隔符，取出第一部分的命令
+cut -d ' '  -f 1   
+</code></pre></li>
+</ul>
+</li>
+</ul>
+
+
+<h2>我的小脚本</h2>
+
+<ul>
+<li><p><a href="/codes/iconv_shell.sh">文本格式转换脚本</a></p>
+
+<p>用 linux 有一个很头疼的问题就就是中文的乱码问题，linux 下中文的编码格式是
+utf-8, windows 默认编码格式是 GB2312， 这导致了 windows 下的文本文件在
+linux 下常常是乱码的，同理 linux 下编辑的文本文件在 windows 下也会乱码。
+为此我们要进行字符编码的转换，即利用 <code>iconv</code> 命令。<code>iconv</code> 命令的基本格式
+如下：</p>
+
+<pre><code>  iconv -f oldcharset -t newcharset  file -o newfile 
+</code></pre>
+
+<p>脚本实现了自动获取字符编码，并转换为 UTF-8 编码的功能，为了解决常常遇到的
+未知编码问题，加入了个默认功能，如果编码未知，强制性的进行 GB18030 到
+UTF-8 的功能，运行起来效果还好。根据这个又修改成了一个右键调用的
+<a href="/codes/UTF8.sh">nautilus-script</a>。</p></li>
+<li><p><a href="/codes/chmod_recursion.sh">批量更改文件权限脚本</a></p>
+
+<p>在拷贝文件时常常遇到拷贝回来的文件的权限不对，一个个更改很麻烦，
+脚本主要用<code>find</code>命令查找对应的项目，然后通过 <code>exec</code> 调用 <code>chmod</code>
+而成，具体请看脚本。</p></li>
+<li><p><a href="/codes/chown_recursion.sh">批量更改文件所有者脚本</a></p>
+
+<p>和上面的脚本很相似，也是用 <code>find</code>, <code>exec</code>, <code>chown</code>,组合而成，
+<code>chown</code>可以同时更改文件的所有者和所属组。</p></li>
+<li><p><a href="/codes/mod-file-extension.sh">更改文件后缀名</a></p>
+
+<p>有时候文件的后缀名不符合要求，如要把 <code>htm</code> 后缀换成 <code>html</code> 后缀，这个脚本
+就很有用。主要用到了一个命令 <code>rename</code>。</p>
+
+<pre><code>  # 将说用的 *.htm 后缀换成 html
+  renam 's/htm$/html' *.htm
+</code></pre></li>
+</ul>
+
+</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-07T21:26:00+08:00" pubdate data-updated="true">Aug 7<span>th</span>, 2012</time></div>
+	<div class="tags">
+
+</div>
+	
+</div></article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+	<a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+	
+	<a class="addthis_counter addthis_pill_style"></a>
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid="></script>
+</div>
+
+
+
+<section id="comment">
+    <h1 class="title">Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2013
+
+    tingxueren
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'tingxueren';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tingxueren.github.com/blog/2012/08/07/shelljiao-ben-fen-xiang/';
+        var disqus_url = 'http://tingxueren.github.com/blog/2012/08/07/shelljiao-ben-fen-xiang/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-37023627-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+
+</body>
+</html>
