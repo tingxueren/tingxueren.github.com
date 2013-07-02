@@ -1,0 +1,214 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>today is SB - Tingxueren's Blog</title>
+	<meta name="author" content="tingxueren">
+
+	
+	<meta name="description" content="这两天遇到了很 SB 的事情，在脑袋冲动的情况下做出了很多 SB 的不理智的决定。记录下来，等以后再 SB 的时候拿出来看看。 缘起 一切的开端始于昨天早上，一早到实验室就发现我无法通过 SSH 登陆到我的 VPS 了。虽然现在手里的这个 VPS 有很多的不足：OpenVZ 架构的，空间很小， &hellip;">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Tingxueren's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script async="true" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">Tingxueren's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="http://google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:tingxueren.github.com">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		<a class="google" href="https://plus.google.com/112617278058034597125?rel=author" title="Google+">Google+</a>
+		
+		
+		<a class="twitter" href="http://twitter.com/tingxueren" title="Twitter">Twitter</a>
+		
+		
+		<a class="github" href="https://github.com/tingxueren" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+    
+	</div>
+	<form class="search" action="http://google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:tingxueren.github.com">
+	</form>
+</nav>
+
+</header>
+	
+		
+<div id="banner" class="inner">
+	<div class="container">
+		<ul class="feed"></ul>
+	</div>
+	<small><a href="http://twitter.com/tingxueren">tingxueren</a> @ <a href="http://twitter.com">Twitter</a></small>
+	<div class="loading">Loading...</div>
+</div>
+<script src="/javascripts/twitter.js"></script>
+<script type="text/javascript">
+	(function($){
+		$('#banner').getTwitterFeed('tingxueren', 4, false);
+	})(jQuery);
+</script>
+
+	
+	<div id="content" class="inner"><article class="post">
+	<h2 class="title">Today Is SB</h2>
+	<div class="entry-content"><p>这两天遇到了很 SB 的事情，在脑袋冲动的情况下做出了很多 SB 的不理智的决定。记录下来，等以后再 SB 的时候拿出来看看。</p>
+
+<h2>缘起</h2>
+
+<p>一切的开端始于昨天早上，一早到实验室就发现我无法通过 SSH 登陆到我的 VPS 了。虽然现在手里的这个 VPS 有很多的不足：OpenVZ 架构的，空间很小，最近服务不稳定，特别是最近基本上三天两头的宕机。 但是总体上还是不错的，流量不限制，延迟很小，在上面搭建的 openvpn 虽然已经被 #GFW 干废掉了，但是添加上前端代理后还是可以用的，最重要的还是比较便宜，一个月不到40块还是能接受的。</p>
+
+<h2>发展</h2>
+
+<p>突然不能 SSH 登录了，但是网站和 openvpn 都正常的工作，第一个念头是伟大的 #GFW 的干扰，#GFW 做这件事情不是一次两次了。但是挂上全局 VPN 后依然无法 SSH 登陆 。看了不是 #GFW 的问题，以为是 iptables 的问题了，进入管理网页清空 iptables 规则后还是不行，通过网页重启了机器后还是不行，火大了。运营商提供的网页的 consle的端口也被禁用了，救命稻草也没了，不清楚到底出现了什么问题，给运营商发邮件但是迟迟收不到邮件。脑子抽了准备恢复系统了，还好 ftp 还是正常的，通过 ftp 备份了不少配置和网站的文件，还好应该损失不大。</p>
+
+<p>等系统重置完成了，收到了回复的邮件：运营商在做虚拟机的迁移，在此期间 VPS 可能工作不正常。我估计 SSH 无法登陆的原因是但是我的 VPS 正在做迁移，VPS 其实是工作正常的，应该是为了迁移的安全运营商暂停了 SSH 的登陆。把系统重装了纯粹是瞎忙活，没办法了，系统重置了还是要把它恢复原装的。按照正常的步骤，登陆，升级，建立账户，设置配置。重启，然后又进不去了，诡异的画面一再出现，把我郁闷的不行，都要吐血了。</p>
+
+<h2>高潮</h2>
+
+<p>昨天夜里又尝试了好几次，恢复了几次系统。问题依旧，开始能登上，升级系统，打打补丁后又登陆不上去了，仔细的排查过了 iptables , sshd_config 都没什么问题。然后就想干脆换个 VPS 提供商吧。逛逛网站发现了 YardVPS ，现在有7折的优惠，一个月35块，和我现在用的差不多。一冲动又拍脑袋买了个，忘记了网上各位对他家服务的诟病 。开通邮件倒是很快收到了，控制面板上也显示了 VPS 已经再线，但是就是 ping 不通，也无法 SSH 登陆。YardVPS 立马给我展示了他们的糟糕的服务，邮件发了，后台看到正在跑了，但是其实 VPS 还是没有开通。google 了下看来和我有同样遭遇的不只一个人。没办法只好发 ticket，杯具的美国时间还没上班，要等到美国人上班了才会处理 ticket，怀着郁闷的心情睡觉去了。</p>
+
+<h2>后续</h2>
+
+<p>早上来了，发现新买的这个 VPS 终于开通了，配置下吧。发现除了客服不给力和美国线路延迟大上传下载比较慢之外，其他的基本比较满意。上午收到了原来的 VPS 提供商的邮件，维护结束一切正常。但是我的 VPS 还是无法用 SSH 登陆，重新生成系统，打补丁，重启，又不能登陆系统了。次凹，到底是怎么回事，突然我想起来了在升级系统前是可以登陆的，升级系统后就不可以登陆了，问题一定出在了系统更新的头上。再次生成系统，慢慢的一步步升级系统，终于找到原因了，原来系统升级的时候会更改 <code>/etc/init/ssh.conf</code> 这个文件，本来默认的规则是保留现在用的，但是脑子抽了，就选择成了升级规则了，新规则估计和主机不兼容什么的然后就不能用，好郁闷啊，原来事情就是这么简单，搞得我折腾了 2 天，重装了系统不下于 10 次。我真的是个 SB。</p>
+
+<h2>终章</h2>
+
+<p>现在 VPS 终于恢复到了和一前一样了，貌似跑的也很顺畅。一番折腾纠结了 2 天，多买了个不需要的 VPS ，浪费了一个月钱。现在只能想让两个都跑着，观察下，看那个更稳定下个月就用哪个了。看来“冲动是魔鬼”确实所言不虚，脑子不冷静的状态下做的决定往往会把事情搞的更糟糕，引以为戒吧，以后再犯二的时候就回头来看看这篇帖子。</p>
+</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-29T20:26:00+08:00" pubdate data-updated="true">Nov 29<span>th</span>, 2012</time></div>
+	<div class="tags">
+
+</div>
+	
+</div>
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		<a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+		
+		
+	</div>
+	
+</div>
+
+
+
+<section id="comment">
+    <h2 class="title">Comments</h2>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2013
+
+    tingxueren
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'tingxueren';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tingxueren.github.com/blog/2012/11/29/today-is-sb/';
+        var disqus_url = 'http://tingxueren.github.com/blog/2012/11/29/today-is-sb/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//go.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-37023627-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+
+</body>
+</html>
