@@ -1,93 +1,97 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
-        <loc>http://tingxueren.github.com/blog/2012/08/03/use-goagent-for-apt-get/</loc>
+        <loc>http://tingxueren.github.io/blog/2012/08/03/use-goagent-for-apt-get/</loc>
         <lastmod>2013-07-02T18:35:40+08:00</lastmod>
     </url>
     <url>
-        <loc>http://tingxueren.github.com/blog/2012/08/03/ubuntu-printer/</loc>
+        <loc>http://tingxueren.github.io/blog/2012/08/03/ubuntu-printer/</loc>
         <lastmod>2013-07-02T18:35:40+08:00</lastmod>
     </url>
     <url>
-        <loc>http://tingxueren.github.com/blog/2012/08/04/git-note/</loc>
+        <loc>http://tingxueren.github.io/blog/2012/08/04/git-note/</loc>
         <lastmod>2013-07-02T18:35:40+08:00</lastmod>
     </url>
     <url>
-        <loc>http://tingxueren.github.com/blog/2012/08/05/hellow-world/</loc>
+        <loc>http://tingxueren.github.io/blog/2012/08/05/hellow-world/</loc>
         <lastmod>2013-07-02T18:35:40+08:00</lastmod>
     </url>
     <url>
-        <loc>http://tingxueren.github.com/blog/2012/08/05/zao-an-%2Cshi-jie/</loc>
+        <loc>http://tingxueren.github.io/blog/2012/08/05/zao-an-%2Cshi-jie/</loc>
         <lastmod>2013-07-02T18:35:40+08:00</lastmod>
     </url>
     <url>
-        <loc>http://tingxueren.github.com/blog/2012/08/05/new-blog-with-octopress/</loc>
+        <loc>http://tingxueren.github.io/blog/2012/08/05/new-blog-with-octopress/</loc>
         <lastmod>2013-07-02T18:35:40+08:00</lastmod>
     </url>
     <url>
-        <loc>http://tingxueren.github.com/blog/2012/08/07/shelljiao-ben-fen-xiang/</loc>
+        <loc>http://tingxueren.github.io/blog/2012/08/07/shelljiao-ben-fen-xiang/</loc>
         <lastmod>2013-07-02T18:35:40+08:00</lastmod>
     </url>
     <url>
-        <loc>http://tingxueren.github.com/blog/2012/09/10/install-dropbox-in-linux/</loc>
+        <loc>http://tingxueren.github.io/blog/2012/09/10/install-dropbox-in-linux/</loc>
         <lastmod>2013-07-02T18:35:40+08:00</lastmod>
     </url>
     <url>
-        <loc>http://tingxueren.github.com/blog/2012/10/20/zhe-teng-vpsshou-ji/</loc>
+        <loc>http://tingxueren.github.io/blog/2012/10/20/zhe-teng-vpsshou-ji/</loc>
         <lastmod>2013-07-02T18:35:40+08:00</lastmod>
     </url>
     <url>
         <loc>
-            http://tingxueren.github.com/blog/2012/11/02/zai-lnmphuan-jing-xia-an-zhuang-wordpress/
+            http://tingxueren.github.io/blog/2012/11/02/zai-lnmphuan-jing-xia-an-zhuang-wordpress/
         </loc>
         <lastmod>2013-07-02T18:35:40+08:00</lastmod>
     </url>
     <url>
-        <loc>http://tingxueren.github.com/blog/2012/11/08/dai-ma-gao-liang-zhe-teng-bi-ji/</loc>
+        <loc>http://tingxueren.github.io/blog/2012/11/08/dai-ma-gao-liang-zhe-teng-bi-ji/</loc>
         <lastmod>2013-07-02T18:35:40+08:00</lastmod>
     </url>
     <url>
-        <loc>http://tingxueren.github.com/blog/2012/11/24/linux-chang-yong-wang-luo-gong-ju/</loc>
+        <loc>http://tingxueren.github.io/blog/2012/11/24/linux-chang-yong-wang-luo-gong-ju/</loc>
         <lastmod>2013-07-02T18:35:40+08:00</lastmod>
     </url>
     <url>
-        <loc>http://tingxueren.github.com/blog/2012/11/29/today-is-sb/</loc>
+        <loc>http://tingxueren.github.io/blog/2012/11/29/today-is-sb/</loc>
         <lastmod>2013-07-02T18:35:40+08:00</lastmod>
     </url>
     <url>
-        <loc>http://tingxueren.github.com/blog/2012/12/07/chu-chi-de-fen-nu/</loc>
+        <loc>http://tingxueren.github.io/blog/2012/12/07/chu-chi-de-fen-nu/</loc>
         <lastmod>2013-07-02T18:35:40+08:00</lastmod>
     </url>
     <url>
-        <loc>http://tingxueren.github.com/blog/2012/12/27/2012nian-du-zong-jie/</loc>
+        <loc>http://tingxueren.github.io/blog/2012/12/27/2012nian-du-zong-jie/</loc>
         <lastmod>2013-07-02T18:35:40+08:00</lastmod>
     </url>
     <url>
-        <loc>http://tingxueren.github.com/blog/2013/03/06/tar-pai-chu-zhi-ding-mu-lu/</loc>
+        <loc>http://tingxueren.github.io/blog/2013/03/06/tar-pai-chu-zhi-ding-mu-lu/</loc>
         <lastmod>2013-07-02T18:35:40+08:00</lastmod>
     </url>
     <url>
         <loc>
-            http://tingxueren.github.com/blog/2013/03/23/vpsan-zhuang-delugebing-she-zhi-iptablesgui-ze/
+            http://tingxueren.github.io/blog/2013/03/23/vpsan-zhuang-delugebing-she-zhi-iptablesgui-ze/
         </loc>
         <lastmod>2013-07-02T18:35:40+08:00</lastmod>
     </url>
     <url>
         <loc>
-            http://tingxueren.github.com/blog/2013/07/02/install-goagent3-dot-0-in-ubuntu12-dot-04/
+            http://tingxueren.github.io/blog/2013/07/02/install-goagent3-dot-0-in-ubuntu12-dot-04/
         </loc>
         <lastmod>2013-07-02T19:15:15+08:00</lastmod>
     </url>
     <url>
-        <loc>http://tingxueren.github.com/robots.txt</loc>
+        <loc>http://tingxueren.github.io/blog/2013/10/22/zhao-gong-zuo-jie-shu-liao/</loc>
+        <lastmod>2013-10-22T20:00:52+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://tingxueren.github.io/robots.txt</loc>
         <lastmod>2013-07-02T18:30:55+08:00</lastmod>
     </url>
     <url>
-        <loc>http://tingxueren.github.com/blog/archives/</loc>
-        <lastmod>2013-07-02T19:15:15+08:00</lastmod>
+        <loc>http://tingxueren.github.io/blog/archives/</loc>
+        <lastmod>2013-10-22T20:00:52+08:00</lastmod>
     </url>
     <url>
-        <loc>http://tingxueren.github.com/</loc>
-        <lastmod>2013-07-02T19:15:15+08:00</lastmod>
+        <loc>http://tingxueren.github.io/</loc>
+        <lastmod>2013-10-22T20:00:52+08:00</lastmod>
     </url>
 </urlset>

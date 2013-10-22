@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Tingxueren's Blog]]></title>
-  <link href="http://tingxueren.github.com/atom.xml" rel="self"/>
-  <link href="http://tingxueren.github.com/"/>
-  <updated>2013-07-02T19:16:47+08:00</updated>
-  <id>http://tingxueren.github.com/</id>
+  <link href="http://tingxueren.github.io/atom.xml" rel="self"/>
+  <link href="http://tingxueren.github.io/"/>
+  <updated>2013-10-22T20:06:26+08:00</updated>
+  <id>http://tingxueren.github.io/</id>
   <author>
     <name><![CDATA[tingxueren]]></name>
     
@@ -14,10 +14,131 @@
 
   
   <entry>
+    <title type="html"><![CDATA[找工作结束了]]></title>
+    <link href="http://tingxueren.github.io/blog/2013/10/22/zhao-gong-zuo-jie-shu-liao/"/>
+    <updated>2013-10-22T16:11:00+08:00</updated>
+    <id>http://tingxueren.github.io/blog/2013/10/22/zhao-gong-zuo-jie-shu-liao</id>
+    <content type="html"><![CDATA[<p>转眼 blog 又快四个月没有更新了，一方面原因是因为懒惰，另一方面原因是确实很忙感觉写个 blog 都没心情了。其实这几个月也发生了很多事情，blog 所用的 vps 也由yardvps 迁移到了 DigitalOcean, blog 的架构也由 LAMP 换成了 LNAMP， 其实就是瞎折腾。 不得不说 Digitalocean 的线路确实要比 yardvps 的线路强的多了，原来的半价买的 yardvps 平均来说一个月要抽风个一周，实在是烦了，转移到了 Digitalocean, 确实很不错，操作方便，也够便宜，最重要的是网络很稳定，不得不赞一个。</p>
+
+<p>从7月到10月基本上都是找工作的节奏，到今天终于结束了，终于签了一个还比较满意的公司，准备去做我喜欢做的东西了，感觉很开心！以后就投入度娘的怀抱了，百度的平台还是不错的，希望以后有更好的发展。</p>
+
+<h2>基本情况</h2>
+
+<p>本科数学专业，非名校计算机小硕</p>
+
+<p>未接受完整的计算机基础教育</p>
+
+<p>对 Linux 比较熟悉，喜欢折腾点东西</p>
+
+<p>算法功底比较薄弱</p>
+
+<p>编程语言只用过 c/c++，shell，python, 且谈不上精通</p>
+
+<p>基本无实际工程项目经验</p>
+
+<p>研究生阶段做的东西偏学术</p>
+
+<h2>求职意向</h2>
+
+<p>互联网公司运维或系统工程师</p>
+
+<p>主要理由：</p>
+
+<ol>
+<li><p>我看好服务端的发展，随着互联网的发展，传统的桌面软件势微，现在更多的是使用 web 和移动 App，但是孱弱的 web 和 App 无法承受用户对数据和资源的需求，更多的请求被压在了服务端，Web 和 App 的繁荣也意味着服务端的繁荣。做服务端，后台方面的工作是很有前途的。</p></li>
+<li><p>自己的爱好兴趣吧，感觉自己挺喜欢折腾这些系统服务器什么的，管理这些机器正常的工作有点像牧羊人看着自己的羊羔都慢慢长大的那种喜悦的感觉。</p></li>
+<li><p>感觉自己的知识结构基本上还是符合做这份工作的基本要求的。</p></li>
+</ol>
+
+
+<h2>准备情况</h2>
+
+<p>基本上从7月份开始准备，从基本的 c/c++ 语法看起，虽然说都用过，但是都没有特别深入的了解，有些语言特性也是是是而非的，必须要过一遍，要不大部分的笔试基础题目是不会做的，当时主要是把《c 程序设计语言》和 《c++ primer》重新看了下。然后就是算法的准备了，感觉算法可能是我最弱的一方面，没有经过严格系统的训练就是搞不懂这些玩意，记得看的书也很杂乱无章，《数据结构》，《c 算法》之类的，但是看的不是很系统。最后是些常考的笔试题目，主要把《剑指 offer》和《编程之美》看了看，《剑指 offer》感觉挺好的，里面都有所有解决方案的源代码，还有测试用例，可以学习下比较严谨的代码风格。《编程之美》主要是些数学题目，可以开阔下眼界，拓展下思路。</p>
+
+<h2>求职过程</h2>
+
+<h3>阿里巴巴实习面试</h3>
+
+<p>2013.05.04 应聘阿里巴巴系统工程师实习生</p>
+
+<p>人生中第一次的电话面试，电话面试表现的还好，但是到了淘宝进行 boss 面的时候，缺乏面试经验的缺点暴露无疑，面试了总共不到半小时就结束了，实习计划破灭。</p>
+
+<h3>华为</h3>
+
+<p>2013.08.04 华为机试</p>
+
+<p>2013.08.07 华为座谈</p>
+
+<p>2013.09.01 华为性格测试</p>
+
+<p>测试后我的华为应聘历程到此结束了，性格测试未通过，然后后面就没有机会了。</p>
+
+<h3>阿里巴巴</h3>
+
+<p>2013.08.30 参加了阿里大讲堂活动，去听了个关于搜索的讲座。感觉还是不错的，听到了很多以前不了解的技术，中午混了块披萨，下午答对了一道题目还拿了本书回来，具体的题目是：“当你在淘宝上搜索一个关键字的时候，后台大概有多少的数据参与了运算？”， 我当时蒙了个 1TB，实际的答案是 1.4TB， 我的最接近。实在没想到，一个小小的搜索背后竟然需要这么海量的数据的支撑。</p>
+
+<p>2013.09.22 阿里巴巴笔试</p>
+
+<p>选择的岗位是系统工程师，貌似杭州的卷子的风格和历年的题目和其他地区的题目都有点差别。更偏重于计算机基础，组成原理方面的知识。附加题还有数据库方面的知识，当时感觉做的很糟糕，但是幸运的是还是有面试的机会。</p>
+
+<p>2013.09.24 阿里巴巴一面</p>
+
+<p>一面的时候是个很年轻的帅哥，见面也不需要什么自我介绍。看着简历聊聊天，貌似对我的 blog 和我以前帮朋友维护的网站都很有兴趣，边看我的 blog，边和我讨论些问题。貌似当时还问了我虚拟机的具体架构，虚拟机如何与宿主机通信等问题，这些问题确实一点都不了解，当时都快跪了，幸好面试官感觉我对这些操作还是很熟悉，而且很有热情做这项工作，给了我二面的机会，还给我我一夜的时间去准备二面，十分感谢他。</p>
+
+<p>2013.09.25 阿里巴巴二面</p>
+
+<p>二面的情况是从头跪到了尾，一方面自己确实没有什么工程项目的经验。另一方面当时面试的时候太紧张，最重要的确实准备不足够，前期的时候准备的更偏重于开发方面的东西，对系统、网络方面的知识没有认真的复习，记得面试官问我相当简单的 TCP 协议中的 Time_Wait 状态是什么的时候，脑子中一片浆糊，没有回答出来。二面不出意料的挂掉了，但是我也学到了不少东西，也更坚定了以后做运维的决心，回去收拾心情，看书学习，准备再战。</p>
+
+<p>2013.09.29 阿里巴巴拒信</p>
+
+<p>人生中第一次正规的拒信，值得留作纪念。</p>
+
+<h3>大众点评</h3>
+
+<p>2013.10.09 大众点评笔试</p>
+
+<p>大众点评的笔试可以说是有点怪异的，网上笔试，不过有时间限制，前面是行测的题目，后面是三道编程题目。可以上网上找答案，可以写伪代码，可以上网搜索答案。记得当时是实验室的同学一起做的，有些题目还是搞不清楚，这可能是我被大众点评秒杀的原因。</p>
+
+<p>2013.10.12 大众点评面试</p>
+
+<p>大众点评的面试还是比较有全面的，对照着简历一点点问。从 vi 中的快捷键到 find 命令的用法，一些基本的 linux 操作都问到了。然后开始问笔试题目怎么做的，我将我的方案说了，基本上有点像暴力搜索，记得同学给我分析过更简单的解决方案，但是当时不理解也不能讲出来到底怎么做。后来看到了我在简历中写了 python，让我用 python实现个堆栈，最简单的就是用 list，但是好久没用了，竟然把堆栈实现成了个队列，不可原谅。后来就大众点评的架构和面试官聊了会，已经知道表现的不怎么好了，最后聊的很坦然。</p>
+
+<p>2013.10.14 大众点评拒信</p>
+
+<p>表现的不好，收到了拒信表现的很平静。</p>
+
+<h3>百度</h3>
+
+<p>2013.10.13 百度笔试</p>
+
+<p>2013.10.14 百度一面</p>
+
+<p>2013.10.15 百度二面</p>
+
+<p>2013.10.18 百度三面</p>
+
+<p>2013.10.22 百度签约</p>
+
+<p>关于百度的面试很长，在这就不详细的写了，准备开个新帖子详细的写。
+在这期间还参加了几个笔试面试：</p>
+
+<h3>创新工厂</h3>
+
+<p>2013.10.11 创新工厂笔试，未获面试机会</p>
+
+<h3>大华</h3>
+
+<p>2013.10.15 大华一面游，主要是做的东西和大华的要求八字不合的感觉。</p>
+
+<p>总体上这两个月比较累，也比较有意义，收获了人生中第一份工作，还是自己比较喜欢的，虽然不是最优的结果，但也是次优的选择了。以后要去帝都了，新的旅程在慢慢展开，未来的道路还要我慢慢去探索，加油！</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[install goagent3.0 in ubuntu12.04]]></title>
-    <link href="http://tingxueren.github.com/blog/2013/07/02/install-goagent3-dot-0-in-ubuntu12-dot-04/"/>
+    <link href="http://tingxueren.github.io/blog/2013/07/02/install-goagent3-dot-0-in-ubuntu12-dot-04/"/>
     <updated>2013-07-02T18:37:00+08:00</updated>
-    <id>http://tingxueren.github.com/blog/2013/07/02/install-goagent3-dot-0-in-ubuntu12-dot-04</id>
+    <id>http://tingxueren.github.io/blog/2013/07/02/install-goagent3-dot-0-in-ubuntu12-dot-04</id>
     <content type="html"><![CDATA[<p>最近 goagent 升级了, 从 2.x 升级到了 3.0 速度貌似没太大的变化，但是感觉稳定了不少。最重要的变化莫过于原来是基于 python2.7 的，新版的直接依赖 python3.3,感觉真的是有点激进了。windows 下用没有任何问题，作者直接在安装包中打包了个精简版本的 python3，但是自己常用的 ubuntu 12.04 还没有安装 python3 还是要自己手动安装下的。具体的步骤可以参考官网的<a href="https://code.google.com/p/goagent/wiki/GoAgent_Linux">wiki</a>, 在按照上面的步骤安装的时候还遇到点小问题，下面是解决的过程。</p>
 
 <h2>Python3 ImportError: No module named zlib</h2>
@@ -60,9 +181,9 @@
   
   <entry>
     <title type="html"><![CDATA[vps 安装 deluge 并设置 iptables 规则]]></title>
-    <link href="http://tingxueren.github.com/blog/2013/03/23/vpsan-zhuang-delugebing-she-zhi-iptablesgui-ze/"/>
+    <link href="http://tingxueren.github.io/blog/2013/03/23/vpsan-zhuang-delugebing-she-zhi-iptablesgui-ze/"/>
     <updated>2013-03-23T15:46:00+08:00</updated>
-    <id>http://tingxueren.github.com/blog/2013/03/23/vpsan-zhuang-delugebing-she-zhi-iptablesgui-ze</id>
+    <id>http://tingxueren.github.io/blog/2013/03/23/vpsan-zhuang-delugebing-she-zhi-iptablesgui-ze</id>
     <content type="html"><![CDATA[<p>昨天 HDC 的下载网站终于恢复了，换了个马甲 <a href="www.hdwing.com">hdwing.com</a> 重新开始提供 PT 服务。原有的 HDC 的数据都还在，网站也迁移到了美国感觉靠谱多了，至少不用担心莫名其妙的被拔网线的问题了。登陆后看了下，除了 logo 更换了，其他的都是那么的熟悉，看到了自己的数据都还在，顿时泪流满面。</p>
 
 <h2>下载工具</h2>
@@ -206,9 +327,9 @@
   
   <entry>
     <title type="html"><![CDATA[tar 排除指定目录]]></title>
-    <link href="http://tingxueren.github.com/blog/2013/03/06/tar-pai-chu-zhi-ding-mu-lu/"/>
+    <link href="http://tingxueren.github.io/blog/2013/03/06/tar-pai-chu-zhi-ding-mu-lu/"/>
     <updated>2013-03-06T19:07:00+08:00</updated>
-    <id>http://tingxueren.github.com/blog/2013/03/06/tar-pai-chu-zhi-ding-mu-lu</id>
+    <id>http://tingxueren.github.io/blog/2013/03/06/tar-pai-chu-zhi-ding-mu-lu</id>
     <content type="html"><![CDATA[<p>很久没有写 blog 了感觉 blog 已经荒废了。上一篇文章在 2012 年底，现在都 2013 年了，2 个多月就这么过去了。在这两个多月从大部分时间在家过年什么都没有做，一直在歇着。1 月底的时候 yardvps 打 5 折， 把 blog 迁移到了这个新的 vps 了，感觉运行很稳定，价格还是很实惠的。blog 搬家没有遇到什么问题，但是今天在用 tar 备份网站的时候遇到点问题，如何排除指定的目录。</p>
 
 <h2>什么是 tar</h2>
@@ -374,9 +495,9 @@
   
   <entry>
     <title type="html"><![CDATA[2012年度总结]]></title>
-    <link href="http://tingxueren.github.com/blog/2012/12/27/2012nian-du-zong-jie/"/>
+    <link href="http://tingxueren.github.io/blog/2012/12/27/2012nian-du-zong-jie/"/>
     <updated>2012-12-27T18:24:00+08:00</updated>
-    <id>http://tingxueren.github.com/blog/2012/12/27/2012nian-du-zong-jie</id>
+    <id>http://tingxueren.github.io/blog/2012/12/27/2012nian-du-zong-jie</id>
     <content type="html"><![CDATA[<p>转眼间又到了岁末，世界依然没有毁灭，世界末日原来只是个小笑话而已，连圣诞节都过了，看来可以踏实的迎接新的一年的到来了。一年就这么不知不觉的过去了，刚还感叹夏天热的要死，现在又在烦恼这不停下雨的冬日，日子就这么不经意的过。既然到了岁末就不能免俗，盘点下一年的得失展望下新的一年就是应有之意。</p>
 
 <p>貌似这一年确实没干太多的事情，但也不是全无收获。上学期结束了所有的课程，估计是这辈子在教室中上课的经历就到此为止了。但是课堂上大部分学的东西现在就快忘记了，学过的东西不用的话确实忘记的很快。貌似学了点嵌入式的课程，虚拟现实技术，数据挖掘什么的，现在留在脑子里的东西估计就剩下点名词，实在是惭愧。貌似上半年还在研究 c++ 和 python，c++ 看的好长在4月份的时候终于看完了一遍，只是看完，但是还是不会用的，需要大量的练习才能熟练。研究 python 的原因很简单，就是看到了常用的翻墙软件 GoAgent 就是用 python 写的，代码也就 1000 多行，但是就能用了，感觉很神奇就想看看 python 是什么。看了几本 python 的书，发现了这种语言和常用的 c/c++ 不一样，是种动态的语言，写起来特别的自由，不用关注各种声明、类型等等细节的问题，只关注如何解决问题，用语言将你的想法表现出来就好，确实很好用。用 python 很笨拙的实现了个小词典，功能很简陋，不过是自己写的第一个能用的 python 程序感觉还是很不错，终于自己能编程解决点小问题了，这种感觉相当的棒。</p>
@@ -398,12 +519,12 @@ perl 语言，正则表达式是个强大的工具，在处理文本时候特别
   
   <entry>
     <title type="html"><![CDATA[出离的愤怒]]></title>
-    <link href="http://tingxueren.github.com/blog/2012/12/07/chu-chi-de-fen-nu/"/>
+    <link href="http://tingxueren.github.io/blog/2012/12/07/chu-chi-de-fen-nu/"/>
     <updated>2012-12-07T21:44:00+08:00</updated>
-    <id>http://tingxueren.github.com/blog/2012/12/07/chu-chi-de-fen-nu</id>
+    <id>http://tingxueren.github.io/blog/2012/12/07/chu-chi-de-fen-nu</id>
     <content type="html"><![CDATA[<p>最近翻墙一直不正常，从“斯巴达”之前开始的，以为是党国开会，正常现象，等过一段时间会开完了，党国的 G 点降低了就会恢复正常。但是美好的期望却往往得到失望的结果，会议早已开完，但是网络封锁却越发的严重了。现在的情况是：openvpn 全线阵亡，即使可以加上前端代理，通过443端口也是命不久已；ssh 隧道基本正常，但是感觉貌似 #GFW 已经很聪明的学会了流量类型识别，通过 ssh 上网没问题，但是想通过 ssh 给 ubuntu 更新下 chrome 都成了问题， WTF；GAE 系统的基本上还算正常，多亏了 google 有 N 多的 ip。一个 ip 网段封锁后换新的 ip 又是一条好汉，所有 ip 都被封锁的那天就不折腾了，那时估计大中华局域网早就建成了。GAE 无法正常的传输 https 的流量，只能用伪造证书来勉强支持 https，慎用为妙。</p>
 
-<p>GFW 的技术水平越来越高了，现在的翻墙简直就是像当年的游击战的架式，你来我往互有攻防。最开始的时候的网页代理，然后的轮子的一批工具，以“自由门”为代表，再然后是 GAE 平台的工具，SSH 隧道，各种 vpn。一个个都前赴后继的被挂掉了，人们牢牢的被封锁在高墙之中，能够自由呼吸的空间越来越少。特别是最近 #GFW 的技术有了很大的进步，基于 openssl 的各种工具都要快失效了。为了更好的对付人们的翻墙手段，竟然引入了机器学习的手段来对加密流量进行分析，打击准确，见血封喉，大家可以拜读下方院士近期发表的<a href="http://tingxueren.github.com/docs/%E7%BD%91%E7%BB%9C%E6%B5%81%E9%87%8F%E5%88%86%E7%B1%BB%E7%A0%94%E7%A9%B6%E8%BF%9B%E5%B1%95%E4%B8%8E%E5%B1%95%E6%9C%9B.pdf">这篇大作</a>，相信会有不少收获。</p>
+<p>GFW 的技术水平越来越高了，现在的翻墙简直就是像当年的游击战的架式，你来我往互有攻防。最开始的时候的网页代理，然后的轮子的一批工具，以“自由门”为代表，再然后是 GAE 平台的工具，SSH 隧道，各种 vpn。一个个都前赴后继的被挂掉了，人们牢牢的被封锁在高墙之中，能够自由呼吸的空间越来越少。特别是最近 #GFW 的技术有了很大的进步，基于 openssl 的各种工具都要快失效了。为了更好的对付人们的翻墙手段，竟然引入了机器学习的手段来对加密流量进行分析，打击准确，见血封喉，大家可以拜读下方院士近期发表的<a href="http://tingxueren.github.io/docs/%E7%BD%91%E7%BB%9C%E6%B5%81%E9%87%8F%E5%88%86%E7%B1%BB%E7%A0%94%E7%A9%B6%E8%BF%9B%E5%B1%95%E4%B8%8E%E5%B1%95%E6%9C%9B.pdf">这篇大作</a>，相信会有不少收获。</p>
 
 <p>都忘记了什么时候开始翻墙了，貌似是莫一天搜索到了有趣的帖子，但是点击链接却是“链接被重置”，现在感觉到很熟悉的错误提示信息，当时却是一片茫然。人都是有好奇心的，越不让人看的东西却千方百计的想看到，压迫的越狠，反抗的越厉害。最终我还是看到了，了解到了 “墙”、“功夫网”、“GFW” 等等的这些很有些特殊含义的词汇。从开始的简单的通过网页翻墙，到现在尝试了 N 种工具却无法翻越这座高墙，我慢慢的明白的墙的含义。</p>
 
@@ -417,9 +538,9 @@ perl 语言，正则表达式是个强大的工具，在处理文本时候特别
   
   <entry>
     <title type="html"><![CDATA[today is SB]]></title>
-    <link href="http://tingxueren.github.com/blog/2012/11/29/today-is-sb/"/>
+    <link href="http://tingxueren.github.io/blog/2012/11/29/today-is-sb/"/>
     <updated>2012-11-29T20:26:00+08:00</updated>
-    <id>http://tingxueren.github.com/blog/2012/11/29/today-is-sb</id>
+    <id>http://tingxueren.github.io/blog/2012/11/29/today-is-sb</id>
     <content type="html"><![CDATA[<p>这两天遇到了很 SB 的事情，在脑袋冲动的情况下做出了很多 SB 的不理智的决定。记录下来，等以后再 SB 的时候拿出来看看。</p>
 
 <h2>缘起</h2>
@@ -448,9 +569,9 @@ perl 语言，正则表达式是个强大的工具，在处理文本时候特别
   
   <entry>
     <title type="html"><![CDATA[Linux 常用网络工具]]></title>
-    <link href="http://tingxueren.github.com/blog/2012/11/24/linux-chang-yong-wang-luo-gong-ju/"/>
+    <link href="http://tingxueren.github.io/blog/2012/11/24/linux-chang-yong-wang-luo-gong-ju/"/>
     <updated>2012-11-24T18:22:00+08:00</updated>
-    <id>http://tingxueren.github.com/blog/2012/11/24/linux-chang-yong-wang-luo-gong-ju</id>
+    <id>http://tingxueren.github.io/blog/2012/11/24/linux-chang-yong-wang-luo-gong-ju</id>
     <content type="html"><![CDATA[<p>既然享受了上网的便利，有时候就不得不忍受网络带来的痛苦。正上网看视频看的 high, 突然网页卡死了，刷新后网页都打不开，正聊 QQ 突然掉线了，想访问些国外网站发现输入域名后跳转到莫名其妙的网站，这时候你就要检查下自己的网络问题了。“工欲善其事，必先利其器”， Linux 下有很好用的网络工具，掌握了这些工具基本上就能找到网络出毛病的原因，自己动手修复了。</p>
 
 <h2>常用工具</h2>
@@ -791,9 +912,9 @@ perl 语言，正则表达式是个强大的工具，在处理文本时候特别
   
   <entry>
     <title type="html"><![CDATA[代码高亮折腾笔记]]></title>
-    <link href="http://tingxueren.github.com/blog/2012/11/08/dai-ma-gao-liang-zhe-teng-bi-ji/"/>
+    <link href="http://tingxueren.github.io/blog/2012/11/08/dai-ma-gao-liang-zhe-teng-bi-ji/"/>
     <updated>2012-11-08T17:19:00+08:00</updated>
-    <id>http://tingxueren.github.com/blog/2012/11/08/dai-ma-gao-liang-zhe-teng-bi-ji</id>
+    <id>http://tingxueren.github.io/blog/2012/11/08/dai-ma-gao-liang-zhe-teng-bi-ji</id>
     <content type="html"><![CDATA[<p>这几天 wordpress 也搭建好了，就开始折腾了，别的配置都是比较简单的，基本上就是换主题，改插件的事情。不懂php也就没有大的改动，就是找了个能看的过去的主题用了个 cache 的插件优化了下，为了听音乐还在侧边栏贴上了个虾米播播，虾米的服务挺好的，赞一个。作为个程学猿还是想在 blog 上分享点代码的，代码显示的不好，连写字的心情都没有。折腾代码的高亮和漂亮的显示是最头疼的事情，还好最后找到了个基本完美的方案，在折腾 wordpress 的同时也研究了下 octopress 的代码高亮，写个日志以为记。</p>
 
 <h2>wordpress 代码高亮方案</h2>
@@ -988,9 +1109,9 @@ perl 语言，正则表达式是个强大的工具，在处理文本时候特别
   
   <entry>
     <title type="html"><![CDATA[在LNMP环境下安装wordpress]]></title>
-    <link href="http://tingxueren.github.com/blog/2012/11/02/zai-lnmphuan-jing-xia-an-zhuang-wordpress/"/>
+    <link href="http://tingxueren.github.io/blog/2012/11/02/zai-lnmphuan-jing-xia-an-zhuang-wordpress/"/>
     <updated>2012-11-02T20:36:00+08:00</updated>
-    <id>http://tingxueren.github.com/blog/2012/11/02/zai-lnmphuan-jing-xia-an-zhuang-wordpress</id>
+    <id>http://tingxueren.github.io/blog/2012/11/02/zai-lnmphuan-jing-xia-an-zhuang-wordpress</id>
     <content type="html"><![CDATA[<p>买了vps后感觉总是让它在空跑很浪费资源的感觉，前期在上面安装了openvpn和ssh只
 用来翻墙，看到负载常常是0.00真的很郁闷。将github.com上以前用octopress生成的
 blog放上去，负载基本上还是零，郁闷了，准备捣鼓wordpress了。</p>
@@ -1086,9 +1207,9 @@ myblog.com 就会在 /home/wwwroot/ 文件夹下生成网站的文件夹：myblo
   
   <entry>
     <title type="html"><![CDATA[折腾vps手记]]></title>
-    <link href="http://tingxueren.github.com/blog/2012/10/20/zhe-teng-vpsshou-ji/"/>
+    <link href="http://tingxueren.github.io/blog/2012/10/20/zhe-teng-vpsshou-ji/"/>
     <updated>2012-10-20T18:55:00+08:00</updated>
-    <id>http://tingxueren.github.com/blog/2012/10/20/zhe-teng-vpsshou-ji</id>
+    <id>http://tingxueren.github.io/blog/2012/10/20/zhe-teng-vpsshou-ji</id>
     <content type="html"><![CDATA[<p>前几天闲逛网页发现了个网站上介绍的一个美国 vps 首月免费，兴冲冲的去注册，把玩了一个下午。环境什么都配置好的时候突然发现登陆不上了，然后就收到了邮件，只提供 3 个小时的免费试用时间，然后我的 vps 就被删除了。靠他大爷的，郁闷了，气的都要吐血了。</p>
 
 <p>一怒之下准备花钱买个 vps 好好玩玩的，linode 是首选，但是因为是穷学生，没米，而且也没有信用卡，玩不起啊。正好逛逛 G+ 发现有人买了个日本的 vps， 配置还可以，关键是还很便宜，很对胃口，还支持支付宝，真是大大的良心啊。下单，买了一个，5 分钟后就可以 ssh 登陆了，确实很快速。</p>
@@ -1260,7 +1381,7 @@ iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -j SNAT --to vps_ip
 
 <p>iptables 是 linux 的防火墙，为了 vps 的安全必须按照一定的规则过滤进出 vps 的
 数据，准许必要的端口开放，关掉非必要的端口，减少被攻击的可能性。一般来说开放
-ssh，ftp，http，https，mysql，openvpn 的端口即可，这个是我的 iptables 设置的<a href="http://tingxueren.github.com/codes/iptables_init.sh">脚本</a>。</p>
+ssh，ftp，http，https，mysql，openvpn 的端口即可，这个是我的 iptables 设置的<a href="http://tingxueren.github.io/codes/iptables_init.sh">脚本</a>。</p>
 
 <h2>参考资料</h2>
 
@@ -1277,9 +1398,9 @@ ssh，ftp，http，https，mysql，openvpn 的端口即可，这个是我的 ipt
   
   <entry>
     <title type="html"><![CDATA[install dropbox in linux]]></title>
-    <link href="http://tingxueren.github.com/blog/2012/09/10/install-dropbox-in-linux/"/>
+    <link href="http://tingxueren.github.io/blog/2012/09/10/install-dropbox-in-linux/"/>
     <updated>2012-09-10T20:49:00+08:00</updated>
-    <id>http://tingxueren.github.com/blog/2012/09/10/install-dropbox-in-linux</id>
+    <id>http://tingxueren.github.io/blog/2012/09/10/install-dropbox-in-linux</id>
     <content type="html"><![CDATA[<p>Dropbox 是个很神奇的工具，你可以用它来同步重要的文件，配置。可以放心的把文件放在云端，作为备份。Dropbox 有着齐全的平台覆盖，不但有 windows客户端，MAC 客户端，还有 ios 客户端，Android 客户端，最让我高兴的是还有 Linux 客户端，这点让我十分的欣赏。Dropbox 真正的实现了全平台覆盖，在不同的平台上都给人一致的体验。</p>
 
 <h2>Dropbox 的安装</h2>
@@ -1296,7 +1417,7 @@ ssh，ftp，http，https，mysql，openvpn 的端口即可，这个是我的 ipt
 <li><p>在主页上有 Dropbox 软件下载, Windows 下客户端是一个单一个软件，Linux
 下却会给人带来点小麻烦。</p></li>
 <li><p>在 ubuntu 下软件中心有 Dropbox，但是安装后会有以下的画面：</p></li>
-<li><p><img src="http://tingxueren.github.com/images/dropbox-error.png" title="dropbox error" alt="" /></p>
+<li><p><img src="http://tingxueren.github.io/images/dropbox-error.png" title="dropbox error" alt="" /></p>
 
 <p>原因是软件中心的 Dropbox 只是个 nautilus 插件，由它整合 Dropbox 和 nautilus
 本身并不是完整的客户端，需要从 Dropbox 官网下载完整的安装包。</p></li>
@@ -1335,9 +1456,9 @@ ssh，ftp，http，https，mysql，openvpn 的端口即可，这个是我的 ipt
   
   <entry>
     <title type="html"><![CDATA[shell脚本分享]]></title>
-    <link href="http://tingxueren.github.com/blog/2012/08/07/shelljiao-ben-fen-xiang/"/>
+    <link href="http://tingxueren.github.io/blog/2012/08/07/shelljiao-ben-fen-xiang/"/>
     <updated>2012-08-07T21:26:00+08:00</updated>
-    <id>http://tingxueren.github.com/blog/2012/08/07/shelljiao-ben-fen-xiang</id>
+    <id>http://tingxueren.github.io/blog/2012/08/07/shelljiao-ben-fen-xiang</id>
     <content type="html"><![CDATA[<p>用着 linux 免不了要和 shell 打交道，shell 是个很强大的工具，内置了多有用的程序，配合着 linux 的管道机制，可以将这些小工具组合成各种各样的脚本，为你服务。下面简单的介绍并分享我的几个小脚本。</p>
 
 <h2>脚本的结构</h2>
@@ -1373,7 +1494,7 @@ cut -d ' '  -f 1
 <h2>我的小脚本</h2>
 
 <ul>
-<li><p><a href="http://tingxueren.github.com/codes/iconv_shell.sh">文本格式转换脚本</a></p>
+<li><p><a href="http://tingxueren.github.io/codes/iconv_shell.sh">文本格式转换脚本</a></p>
 
 <p>用 linux 有一个很头疼的问题就就是中文的乱码问题，linux 下中文的编码格式是
 utf-8, windows 默认编码格式是 GB2312， 这导致了 windows 下的文本文件在
@@ -1384,17 +1505,17 @@ linux 下常常是乱码的，同理 linux 下编辑的文本文件在 windows �
 脚本实现了自动获取字符编码，并转换为 UTF-8 编码的功能，为了解决常常遇到的
 未知编码问题，加入了个默认功能，如果编码未知，强制性的进行 GB18030 到
 UTF-8 的功能，运行起来效果还好。根据这个又修改成了一个右键调用的
-<a href="http://tingxueren.github.com/codes/UTF8.sh">nautilus-script</a>。</p></li>
-<li><p><a href="http://tingxueren.github.com/codes/chmod_recursion.sh">批量更改文件权限脚本</a></p>
+<a href="http://tingxueren.github.io/codes/UTF8.sh">nautilus-script</a>。</p></li>
+<li><p><a href="http://tingxueren.github.io/codes/chmod_recursion.sh">批量更改文件权限脚本</a></p>
 
 <p>在拷贝文件时常常遇到拷贝回来的文件的权限不对，一个个更改很麻烦，
 脚本主要用<code>find</code>命令查找对应的项目，然后通过 <code>exec</code> 调用 <code>chmod</code>
 而成，具体请看脚本。</p></li>
-<li><p><a href="http://tingxueren.github.com/codes/chown_recursion.sh">批量更改文件所有者脚本</a></p>
+<li><p><a href="http://tingxueren.github.io/codes/chown_recursion.sh">批量更改文件所有者脚本</a></p>
 
 <p>和上面的脚本很相似，也是用 <code>find</code>, <code>exec</code>, <code>chown</code>,组合而成，
 <code>chown</code>可以同时更改文件的所有者和所属组。</p></li>
-<li><p><a href="http://tingxueren.github.com/codes/mod-file-extension.sh">更改文件后缀名</a></p>
+<li><p><a href="http://tingxueren.github.io/codes/mod-file-extension.sh">更改文件后缀名</a></p>
 
 <p>有时候文件的后缀名不符合要求，如要把 <code>htm</code> 后缀换成 <code>html</code> 后缀，这个脚本
 就很有用。主要用到了一个命令 <code>rename</code>。</p>
@@ -1409,9 +1530,9 @@ UTF-8 的功能，运行起来效果还好。根据这个又修改成了一个�
   
   <entry>
     <title type="html"><![CDATA[new blog with octopress]]></title>
-    <link href="http://tingxueren.github.com/blog/2012/08/05/new-blog-with-octopress/"/>
+    <link href="http://tingxueren.github.io/blog/2012/08/05/new-blog-with-octopress/"/>
     <updated>2012-08-05T11:52:00+08:00</updated>
-    <id>http://tingxueren.github.com/blog/2012/08/05/new-blog-with-octopress</id>
+    <id>http://tingxueren.github.io/blog/2012/08/05/new-blog-with-octopress</id>
     <content type="html"><![CDATA[<h2>新的 blog</h2>
 
 <p>对前几天建立的 blog ，基于 jekyllbootstrap 感到不爽，就换了个模板，即</p>
@@ -1426,9 +1547,9 @@ UTF-8 的功能，运行起来效果还好。根据这个又修改成了一个�
   
   <entry>
     <title type="html"><![CDATA[早安，世界]]></title>
-    <link href="http://tingxueren.github.com/blog/2012/08/05/zao-an-%2Cshi-jie/"/>
+    <link href="http://tingxueren.github.io/blog/2012/08/05/zao-an-%2Cshi-jie/"/>
     <updated>2012-08-05T10:10:00+08:00</updated>
-    <id>http://tingxueren.github.com/blog/2012/08/05/zao-an-,shi-jie</id>
+    <id>http://tingxueren.github.io/blog/2012/08/05/zao-an-,shi-jie</id>
     <content type="html"><![CDATA[<h2>中文的题目貌似也可以</h2>
 
 <p>就是题目被自动的转化为拼音，看起来有点蛋疼。</p>
@@ -1450,9 +1571,9 @@ UTF-8 的功能，运行起来效果还好。根据这个又修改成了一个�
   
   <entry>
     <title type="html"><![CDATA[hellow world]]></title>
-    <link href="http://tingxueren.github.com/blog/2012/08/05/hellow-world/"/>
+    <link href="http://tingxueren.github.io/blog/2012/08/05/hellow-world/"/>
     <updated>2012-08-05T09:32:00+08:00</updated>
-    <id>http://tingxueren.github.com/blog/2012/08/05/hellow-world</id>
+    <id>http://tingxueren.github.io/blog/2012/08/05/hellow-world</id>
     <content type="html"><![CDATA[<h2>小测试</h2>
 
 <ul>
@@ -1477,12 +1598,12 @@ UTF-8 的功能，运行起来效果还好。根据这个又修改成了一个�
   
   <entry>
     <title type="html"><![CDATA[git note]]></title>
-    <link href="http://tingxueren.github.com/blog/2012/08/04/git-note/"/>
+    <link href="http://tingxueren.github.io/blog/2012/08/04/git-note/"/>
     <updated>2012-08-04T00:00:00+08:00</updated>
-    <id>http://tingxueren.github.com/blog/2012/08/04/git-note</id>
+    <id>http://tingxueren.github.io/blog/2012/08/04/git-note</id>
     <content type="html"><![CDATA[<p>最近一段时间学习Git，并在github上注册了帐号，上传了一些自己写的玩具代码，在github上搭建了自己的blog。发现Git是个挺强大的工具，写点笔记以免遗忘。</p>
 
-<p><img src="http://tingxueren.github.com/images/favicon.ico" title="favicon" alt="" /></p>
+<p><img src="http://tingxueren.github.io/images/favicon.ico" title="favicon" alt="" /></p>
 
 <h3>Git和github简要介绍</h3>
 
@@ -1603,9 +1724,9 @@ blog 很简单：</p>
   
   <entry>
     <title type="html"><![CDATA[ubuntu开启打印机服务]]></title>
-    <link href="http://tingxueren.github.com/blog/2012/08/03/ubuntu-printer/"/>
+    <link href="http://tingxueren.github.io/blog/2012/08/03/ubuntu-printer/"/>
     <updated>2012-08-03T22:32:00+08:00</updated>
-    <id>http://tingxueren.github.com/blog/2012/08/03/ubuntu-printer</id>
+    <id>http://tingxueren.github.io/blog/2012/08/03/ubuntu-printer</id>
     <content type="html"><![CDATA[<h2>目的</h2>
 
 <p>局域网中有空闲的打印机，可以做成打印机服务器，局域网中的用户添加网络打印机就可以自由的使用，方便，且节省资源，达到了设备充分利用的效果。</p>
@@ -1647,9 +1768,9 @@ blog 很简单：</p>
   
   <entry>
     <title type="html"><![CDATA[use goagent for apt get]]></title>
-    <link href="http://tingxueren.github.com/blog/2012/08/03/use-goagent-for-apt-get/"/>
+    <link href="http://tingxueren.github.io/blog/2012/08/03/use-goagent-for-apt-get/"/>
     <updated>2012-08-03T00:00:00+08:00</updated>
-    <id>http://tingxueren.github.com/blog/2012/08/03/use-goagent-for-apt-get</id>
+    <id>http://tingxueren.github.io/blog/2012/08/03/use-goagent-for-apt-get</id>
     <content type="html"><![CDATA[<h2>简介</h2>
 
 <p>goagent 干什么用的 我就不说了 安装百度有大把的教程，apt-get 在安装一些软件的话 如果要从国外下载 那么可以考虑使用这种方法，apt-get 设置代理的方法：</p>
