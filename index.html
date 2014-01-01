@@ -7,7 +7,7 @@
 	<meta name="author" content="tingxueren">
 
 	
-	<meta name="description" content="今天终于功德圆满了，上午和百度的 HR 谈了会，因为三方还没到，就和百度签了 2 方，也算是给自己一个交代。基本上结果还是满意的，能去做自己想做的东西本身就是一种幸福，回想起来这几天的笔试面试，心情像过山车似的上下起伏，有兴奋，有紧张，有焦虑，有欣喜。一段经历往往就是这么令人印象深刻。 2013 &hellip;">
+	<meta name="description" content="最近论文写完了，不安分的心总是静不下来，又开始了一轮新的折腾。最近忙活的事情乱七八糟的，主要有下面的几件事：安装Arch， 重新投奔Arch旗下；申请到了Windows Azure的试用帐号，尝试国内的云服务；加入了WCG计划，开挖ripple币，貌似挖了那么久还不够电费的。 安装Arch &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -94,6 +94,322 @@
 
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2014/01/01/zui-jin-zhe-teng-bi-ji/">
+		
+			最近折腾笔记</a>
+	</h2>
+	<div class="entry-content">
+		<p>最近论文写完了，不安分的心总是静不下来，又开始了一轮新的折腾。最近忙活的事情乱七八糟的，主要有下面的几件事：安装Arch， 重新投奔Arch旗下；申请到了Windows Azure的试用帐号，尝试国内的云服务；加入了WCG计划，开挖ripple币，貌似挖了那么久还不够电费的。</p>
+
+<h2>安装Arch</h2>
+
+<p>Arch是一个很优秀的发行版，哲学就是KISS，一切都遵循着最大的定制化的准则，像搭积木似的可以搭建出自己满意的一个实用的系统。和我常用的ubuntu不同的是不提供一个开箱即用的桌面环境，一切都要自己来搭建。Arch的包管理是很激进的，向来追求最新的软件，而不太考虑软件的稳定性，而且是滚动发行的版本，不是像有些发行版那样有个稳定的开发周期，如果系统关键部件调整而没有按照wiki的方法做好调整就升级的话常常造成系统损坏无法开机的悲剧。</p>
+
+<p>曾经使用过Arch四个月，大概是2012.04-2012.07,当时的安装有一个自动化的脚本，安装起来比较简单，使用起来还好，就是笔记本无法正常的休眠和唤醒，这个比较头大，一直没有解决。最后在有一次升级的时候没有注意一些警告强行升级导致了GRUB的引导出错了，Windows 7和Arch 都找不到了，当时也用Arch烦就彻底的删除了Arch，装回了ubuntu了，还是它省心。最近ubuntu越来越慢，很臃肿，用时间长了又想尝试新的东西，加上笔记本的分区很不合理，C盘只有500M的剩余空间了，索性全部格掉重新安装成 Windows 7 + Arch 双系统。Widonws的安装没什么可说的，Arch的安装倒是有些需要注意的地方，Arch的wiki是很好的资料，基本上所有的操作都是参照着wiki的介绍。</p>
+
+<h3>分区</h3>
+
+<p>本次使用的安装介质是archlinux-2013.12.01-dual.iso，使用dd命令烧录到了u盘中安装的。从u盘启动后进入了Arch的live cd模式，第一步就是分区，因为是双系统，Windows已经安装好了，需要多重引导，分区方面需要特别的留意，双系统引导最好使用MBR引导，使用了cfdisk的分区工具，这个工具很直观，比fdisk好用。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'> Name                   Flags                Part Type           FS Type                        [Label]                    Size (MB)
+</span><span class='line'>-----------------------------------------------------------------------------------------------------------------------------------------------
+</span><span class='line'>                                              Primary            Free Space                                                     2.10           *
+</span><span class='line'> sda1                   Boot                  Primary            ntfs                           [Windows-7]                 85901.45           *
+</span><span class='line'> sda5                   NC                    Logical            ntfs                           [D-Disk]                    85899.35           *
+</span><span class='line'> sda6                   NC                    Logical            ntfs                           [E-Disk]                    85899.35           *
+</span><span class='line'> sda7                                         Logical            swap                                                        4096.19           *
+</span><span class='line'> sda8                   Boot                  Logical            ext4                                                       20480.95           *
+</span><span class='line'> sda9                                         Logical            ext4                                                       37793.57           *</span></code></pre></td></tr></table></div></figure>
+
+
+<p>sda8挂载在<code>/</code>上，sda9挂载在<code>/home</code>上，注意要将挂载到根的分区设置为可引导的。然后格式化各个分区，并挂载swap。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># 根据自己的实际情况进行修改
+</span><span class='line'>mkfs.ext4 /dev/sda8    
+</span><span class='line'>mkfs.ext4 /dev/sda9
+</span><span class='line'>mkswap /dev/sda7 
+</span><span class='line'>swapon /dev/sda7</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>安装基本系统</h3>
+
+<p>这部分基本上按照wiki的操作就可以了：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># 挂载分区
+</span><span class='line'>mkdir /mnt/home
+</span><span class='line'>mount /dev/sda8 /mnt
+</span><span class='line'>mount /dev/sda9 /mnt/home</span></code></pre></td></tr></table></div></figure>
+
+
+<p>设置网络和安装源，这点不同人的情况不同，要按照自己的实际情况进行设置</p>
+
+<p>安装基本系统</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#pacstrap /mnt base base-devel
+</span><span class='line'>Generate an fstab
+</span><span class='line'># genfstab -U -p /mnt &gt;&gt; /mnt/etc/fstab
+</span><span class='line'># nano /mnt/etc/fstab</span></code></pre></td></tr></table></div></figure>
+
+
+<p>chroot 并配置基本的系统</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># 使用bash
+</span><span class='line'># arch-chroot /mnt /bin/bash
+</span><span class='line'># 设置hostname
+</span><span class='line'># echo myhostname &gt; /etc/hostname
+</span><span class='line'># 设置时区
+</span><span class='line'># ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+</span><span class='line'># 设置locale
+</span><span class='line'># nano /etc/locale.gen
+</span><span class='line'>en_US.UTF-8 UTF-8
+</span><span class='line'>zh_CN.UTF-8 UTF-8
+</span><span class='line'># locale-gen
+</span><span class='line'># 设置硬件时钟为UTC
+</span><span class='line'># hwclock --systohc --utc
+</span><span class='line'># 设置网络，启用dhcpcd
+</span><span class='line'># systemctl enable dhcpcd.service
+</span><span class='line'># 设置无线网络
+</span><span class='line'># pacman -S iw wpa_supplicant
+</span><span class='line'># Make initramfs (RAM Disk) 
+</span><span class='line'># mkinitcpio -p linux
+</span><span class='line'># 设置 root 密码
+</span><span class='line'># passwd
+</span><span class='line'># 安装GRUB引导，现在GRUB有bug，这个bug导致了我尝试了5遍都没有正常的引导起来
+</span><span class='line'># 解决方案很简单，具体参见这个[网页](https://bugs.archlinux.org/task/38041?project=1&cat%5B0%5D=31&string=grub)
+</span><span class='line'>Known issue with known workaround: add the following to /etc/default/grub
+</span><span class='line'># fix broken grub.cfg gen
+</span><span class='line'>GRUB_DISABLE_SUBMENU=y
+</span><span class='line'># 双系统引导还需要附加软件
+</span><span class='line'># pacman -S os-prober
+</span><span class='line'># grub-mkconfig -o /boot/grub/grub.cfg
+</span><span class='line'># grub-install /dev/sda
+</span><span class='line'># 退出chroot，卸载磁盘，然后重启
+</span><span class='line'># exit
+</span><span class='line'># umount -R /mnt
+</span><span class='line'># reboot
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>安装gnome3桌面</h3>
+
+<p>一直用着gnome3的桌面，虽然说KDE桌面更漂亮，也用了一段时间，但是依然不习惯，gnome3看来更符合我的口味。Arch中安装起来也很简单，继续copy wiki：</p>
+
+<h4>安装X</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># 基本X组件
+</span><span class='line'># pacman -S xorg-server xorg-server-utils xorg-xinit
+</span><span class='line'>Install mesa for 3D support:
+</span><span class='line'># pacman -S mesa
+</span><span class='line'># 安装显卡驱动,我的是Nvidia
+</span><span class='line'># pacman -S nvidia
+</span><span class='line'># 触摸板驱动
+</span><span class='line'># pacman -S xf86-input-synaptics
+</span><span class='line'># 测试X系统
+</span><span class='line'># pacman -S xorg-twm xorg-xclock xterm
+</span><span class='line'># 应该能看到图形界面了
+</span><span class='line'># startx
+</span><span class='line'># exit</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>安装gnome3</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># pacman -S gnome gnome-extra gdm
+</span><span class='line'># 开机启动gdm，不使用startx
+</span><span class='line'># systemctl enable gdm
+</span><span class='line'># 建立常用的用户
+</span><span class='line'># useradd -G wheel -m -s /bin/bash user_name
+</span><span class='line'># passwd user_name
+</span><span class='line'># usermod -G adm -a  user_name</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>字体与输入法</h4>
+
+<p>Arch默认的字体配置是惨不忍睹的，gnome绑定的ibus输入法也不怎么样，准备都要重新调整，换成自己常用的，准备安装的输入法是fcitx，字体配置方案向ubuntu看齐，感觉ubuntu的字体配置相当的不错。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># pacman -S fcitx-im fcitx-config
+</span><span class='line'># 在~/.xprofile和~/.xinitrc中加入下面三行
+</span><span class='line'> export GTK_IM_MODULE=fcitx
+</span><span class='line'> export QT_IM_MODULE=fcitx
+</span><span class='line'> export XMODIFIERS="@im=fcitx"
+</span><span class='line'># 重新登录应该就能用了
+</span><span class='line'># 推荐sunpinyin
+</span><span class='line'># pacman -S fcitx-sunpinyin</span></code></pre></td></tr></table></div></figure>
+
+
+<p>字体的配置可以参考<a href="http://blog.chinaunix.net/uid-25906175-id-3072940.html">Archlinux 字体配置</a>。</p>
+
+<h3>杂项</h3>
+
+<p>双系统设置时钟的问题，参考<a href="http://webdancer.is-programmer.com/posts/29553.html">archlinux入门&mdash;设置时钟</a>。</p>
+
+<p>使用octopress的问题，参考<a href="http://shadow.ma/blog/2013/04/07/octopress-on-arch-linux/">Octopress 在 Arch Linux 下的一些問題</a>。</p>
+
+<h2>Windows Azure</h2>
+
+<p>Windows Azure是微软家的云服务，由于天朝的特殊环境，分成了国际版和中国版，我试用的是中国版，由世纪互联公司运营。还是蛮幸运的，在v2ex上看到了可以免费试用的消息就填了个邮箱，写了个申请，就很快的得到了试用的机会。</p>
+
+<p>试用的配置还是很不错的，最多可以用4个核心，磁盘空间上面Windows虚拟机有120+G的C盘，还有100+G的D盘，据说是临时的盘，但是我没有发现什么区别，Linux的磁盘空间少了点，<code>/</code>有29G，<code>/mnt</code>有135G，为NTFS的盘。我在上面建立了一个ubuntu 12.04的虚拟机和一个Windows Server 2012虚拟机，正好把cpu分配的额度用完。</p>
+
+<p>Windows的服务器是使用远程桌面登录的，Linux可以正常的使用ssh登录管理。Azure自带的有防火墙，上面可以指定相应的端口的策略，看文档上写的暂时不支持iptables的设置，所以Linux的机器上就没有开防火墙，只是在管理界面上开了必要的端口。管理界面是比较清爽的，看起来很错，但是不清楚如何通过web直接访问机器，比如防火墙配置错误，无法ssh登录了，或者ssh挂掉了如何修复。管理界面上只有关闭、重启等寥寥几个选项，不知道遇到这种情况怎么办，是不是只有重装了，原来的数据又怎么办？</p>
+
+<p>Windows Azure的虚拟机的带宽还是不错的，虽然不能和国外的VPS的100M或者1G的带宽相比，但是至少不差。据说是共享的带宽，在服务器中下载速度能达到5MB/s，出口带宽感觉也能达到4M。还有点不爽的是服务器禁止ping，无法在服务器内部使用ping，在外面也无法ping通服务器，有一个替代的方式是使用tcpping，Windows下的具体的使用方法可以参见这篇<a href="http://blog.sharepointsaigon.com/2012/12/ping-azure-vm.html">文章</a>, Linux的使用方法<a href="http://xmodulo.com/2013/01/how-to-install-tcpping-on-linux.html">在此</a>。</p>
+
+<p>由于blog架设在Digitalocean上了，科学上网的服务也无法在国内服务器上部署，因此Windows Azure的服务器在我的手上基本上在浪费，只用来当个迅雷下载工具了，学校最近封锁了迅雷，还限制了网速，有个不限速的服务器用着也很爽。</p>
+
+<h2>ripple矿工</h2>
+
+<p>下介绍下WCG，因为XRP是通过在WCG上做贡献才能换到的。下面是WCG的官方介绍：</p>
+
+<p>我们的任务、工作以及志愿者
+World Community Grid 的任务是创建世界上最大的公共计算网格，以执行能够造福人类的项目。</p>
+
+<p>我们已经开发了技术基础结构，该结构可作为用于科学研究的网格的基础。我们的成功依靠大家共同贡献各自空闲的计算机时间，让世界变得更美好。</p>
+
+<p>World Community Grid 仅将这项技术用于公共非盈利组织的人道主义研究，如果没有公共网格，这些研究就会因高昂的计算机基础结构成本而无法完成。作为我们对促进人类福祉的承诺，所有的研究结果都将公开，以供全球的研究团体共享。</p>
+
+<p>至于ripple是什么就不介绍了，想知道干什么的，请google。</p>
+
+<p>首先去WCG官网注册个帐号，官网<a href="https://secure.worldcommunitygrid.org/index.jsp">在此</a>，然后你需要关联你的ripple帐号与WCG帐号，这样你在WCG上做的贡献才能获得ripple官方的奖励，关联的网站<a href="http://www.computingforgood.org/">在此</a>。</p>
+
+<p>在网站下载<a href="https://secure.worldcommunitygrid.org/reg/ms/viewDownloadAgain.do">WCG软件</a>，Windows下和Linux下的图形界面基本类似，Linux下的字符界面的操作略有不同，下面简要介绍下步骤。</p>
+
+<p>全命令行进行挖矿教程如下：
+最好用包管理器安装boinc相关软件，Ubuntu、Debain系统安装命令：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get install boinc-client boinc-manager
+</span><span class='line'>
+</span><span class='line'>安装完成之后boinc-client已经启动，现只需运行wcg项目，命令如下
+</span><span class='line'>sudo boinccmd --project_attach http://www.worldcommunitygrid.org/ 弱账户密钥
+</span><span class='line'>
+</span><span class='line'>其中弱账户密钥在 https://secure.worldcommunitygrid.org/ “setting” -&gt; “我的概要文件”
+</span><span class='line'>
+</span><span class='line'>关于BOINC客户端的命令详情参考：http://www.equn.com/wiki/Boinccmd</span></code></pre></td></tr></table></div></figure>
+
+
+<p>关于收益，貌似比较少，最近的行情是300个贡献点数能换1个XRP，1个XRP成交价大概是0.16RMB左右。一般一天一台普通的电脑的贡献点数是5000点左右，不到3块钱，不过聊胜于无，也算是为世界做出点贡献，毕竟计算机闲着也是闲着。</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-01-01T12:43:00+08:00" pubdate data-updated="true">Jan 1<span>st</span>, 2014</time></div>
+	<div class="tags">
+
+</div>
+	
+</div>
+</article>
 
 
     <article class="post">
@@ -1397,231 +1713,6 @@ perl 语言，正则表达式是个强大的工具，在处理文本时候特别
 </div>
 </article>
 
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2012/11/08/dai-ma-gao-liang-zhe-teng-bi-ji/">
-		
-			代码高亮折腾笔记</a>
-	</h2>
-	<div class="entry-content">
-		<p>这几天 wordpress 也搭建好了，就开始折腾了，别的配置都是比较简单的，基本上就是换主题，改插件的事情。不懂php也就没有大的改动，就是找了个能看的过去的主题用了个 cache 的插件优化了下，为了听音乐还在侧边栏贴上了个虾米播播，虾米的服务挺好的，赞一个。作为个程学猿还是想在 blog 上分享点代码的，代码显示的不好，连写字的心情都没有。折腾代码的高亮和漂亮的显示是最头疼的事情，还好最后找到了个基本完美的方案，在折腾 wordpress 的同时也研究了下 octopress 的代码高亮，写个日志以为记。</p>
-
-<h2>wordpress 代码高亮方案</h2>
-
-<p>总体上 wordpress 方案就是找插件，但是找到个可以用的，用着顺手的插件真的好麻烦,经过了很多的测试终于选定了现在用的插件。下面是各个插件的试用感受。</p>
-
-<ul>
-<li><p><a href="http://www.boke8.net/wordpress-wp-syntax-button.html">WP-Syntax</a></p>
-
-<p>这个插件是我用的第一个插件，还有个 <code>WP-Syntax Button</code> 配套的按钮，用起来还是凑合。但是用了一段后发现严重的问题，在编辑的时候如果来回的在可视化视图和 html 视图之间切换的话会造成代码不能正常的高亮，排版被破坏，而且不支持 tab 缩进，这点是我最不能忍受的。我所有的代码都是 tab 缩进的贴在网页上却把所有的 tab 都删除了，代码看起来就一团糟了。</p></li>
-<li><p><a href="http://codeup.org/archives/128">SyntaxHighlighter</a></p>
-
-<p>因为 WP-Syntax 的不靠谱我又换了这个插件，这个插件比 WP-Syntax 好用的多了，一切都在可视化视图中修改就好，语法也很简单：[lang]code[/lang],这样做就好了而且切换可视化视图和 html 视图的话代码也不会乱掉。但是不支持 tab 缩进的问题依然没有解决。</p></li>
-<li><p><a href="http://www.guansoft.com/syntaxhighlighter.html">SyntaxHighlighter++</a></p>
-
-<p>这个插件完美的解决了我的问题不得不赞个，安装后会在编辑页面出现个新的编辑窗口，把代码贴上去，然后点击插入就好了。支持 tab 缩进，不需要改动 html 代码用着很舒服，还是国人写的，更要支持下，以后不出意外的话这个插件会一直用下去。</p></li>
-</ul>
-
-
-<h2>octopress 代码高亮方案</h2>
-
-<p>   以前用 octopress 写东西的时候没注意代码高亮的问题，原来插入代码为了美观只是在 markdown 文本里面把代码行缩进8个空格，排整齐，效果还凑合，但是这样不会有高亮的效果的，而且手动的打空格是很憋屈的事情。查找了下官方的教程终于找到了适合的方案。</p>
-
-<p>   官方的<a href="http://octopress.org/docs/blogging/code/"> octopress 代码高亮教程</a>,同时还有篇<a href="http://xiongbupt.github.com/blog/2012/06/08/octopressdai-ma-gao-liang/">非官方中文翻译</a>。</p>
-
-<p>   看了这两篇文章后我就准备尝试，但是还是不知道markdown源文件到底该怎么写，幸好 octopress 的<a href="https://github.com/imathis/octopress">官网</a>就托管在 github 上，上面有生成的页面，也有 markdown 源代码,这下可以对照着看了。</p>
-
-<p>   我很喜欢<code>backtick-codeblock</code>的代码高亮方式，很简单，在代码前后加上三个反引号就好了，在 github 上找到了<a href="https://github.com/imathis/octopress/blob/site/source/docs/plugins/backtick-codeblock/index.markdown"> markdown 文件</a>。下面是简单的摘录。</p>
-
-<ul>
-<li><p>语法</p>
-
-<pre><code> ``` [language] [title] [url] [link text] [linenos:false] [start:#] [mark:#,#-#]
- code snippet
- ```
-</code></pre></li>
-<li><p>Basic options</p>
-
-<pre><code> [language] - Used by the syntax highlighter. Passing 'plain' disables highlighting.
- [title] - Add a figcaption to your code block.
- [url] - Download or reference link for your code.
- [Link text] - Text for the link, defaults to 'link'.
-</code></pre></li>
-<li><p>源码</p>
-
-<pre><code> ``` ruby Discover if a number is prime http://www.noulakaz.net/weblog/2007/03/18/a-regular-expression-to-check-for-prime-numbers/ Source Article
- class Fixnum
-   def prime?
-     ('1' * self) !~ /^1?$|^(11+?)\1+$/
-   end
-  end
- ```
-</code></pre></li>
-<li>显示效果</li>
-</ul>
-
-
-<figure class='code'><figcaption><span>Discover if a number is prime</span><a href='http://www.noulakaz.net/weblog/2007/03/18/a-regular-expression-to-check-for-prime-numbers/'>Source Article</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Fixnum</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">prime?</span>
-</span><span class='line'>    <span class="p">(</span><span class="s1">&#39;1&#39;</span> <span class="o">*</span> <span class="nb">self</span><span class="p">)</span> <span class="o">!~</span> <span class="sr">/^1?$|^(11+?)\1+$/</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>注意事项</h3>
-
-<p>   指定高亮的代码的语言时要写清楚，shell 脚本的语言类型是 <code>sh</code>，即使是 <code>Bash</code> 的脚本也应该用 <code>sh</code>，写作 <code>bash</code> 在  <code>rake generate</code> 的阶段会报错的。</p>
-
-<h3>高亮代码展示</h3>
-
-<figure class='code'><figcaption><span>shell 命令行</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># 升级源，并更新系统</span>
-</span><span class='line'><span class="nv">$ </span>sduo apt-get update <span class="o">&amp;&amp;</span> sudo apt-get upgrade
-</span><span class='line'><span class="c"># 得到系统的内核信息</span>
-</span><span class='line'><span class="nv">$ </span>uname -a
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>c++ 代码</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="cp">#include &lt;iostream&gt;  </span>
-</span><span class='line'><span class="cp">#include &lt;algorithm&gt;  </span>
-</span><span class='line'><span class="cp">#include &lt;string&gt;  </span>
-</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="n">main</span><span class="p">()</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>   <span class="n">string</span> <span class="n">str1</span><span class="p">;</span>
-</span><span class='line'>   <span class="n">string</span> <span class="n">str2</span><span class="p">;</span>
-</span><span class='line'>   <span class="k">while</span><span class="p">(</span><span class="n">cin</span><span class="o">&gt;&gt;</span><span class="n">str1</span><span class="o">&gt;&gt;</span><span class="n">str2</span><span class="p">)</span>
-</span><span class='line'>   <span class="p">{</span>
-</span><span class='line'>       <span class="kt">int</span> <span class="n">nLen1</span><span class="p">,</span> <span class="n">nLen2</span><span class="p">,</span> <span class="n">nLen</span><span class="p">;</span>
-</span><span class='line'>       <span class="n">nLen1</span> <span class="o">=</span> <span class="n">str1</span><span class="p">.</span><span class="n">length</span><span class="p">();</span>
-</span><span class='line'>       <span class="n">nLen2</span> <span class="o">=</span> <span class="n">str2</span><span class="p">.</span><span class="n">length</span><span class="p">();</span>
-</span><span class='line'>       <span class="n">nLen</span> <span class="o">=</span> <span class="n">nLen1</span> <span class="o">&gt;</span> <span class="n">nLen2</span> <span class="o">?</span> <span class="n">nLen1</span> <span class="o">:</span> <span class="n">nLen2</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>       <span class="n">reverse</span><span class="p">(</span><span class="n">str1</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">str1</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
-</span><span class='line'>       <span class="n">reverse</span><span class="p">(</span><span class="n">str2</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">str2</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
-</span><span class='line'>
-</span><span class='line'>       <span class="c1">//高位补零  </span>
-</span><span class='line'>       <span class="k">if</span> <span class="p">(</span><span class="n">nLen</span> <span class="o">&gt;</span> <span class="n">nLen1</span><span class="p">)</span> <span class="n">str1</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">nLen</span> <span class="o">-</span> <span class="n">nLen1</span><span class="p">,</span> <span class="sc">&#39;0&#39;</span><span class="p">);</span>
-</span><span class='line'>       <span class="k">if</span> <span class="p">(</span><span class="n">nLen</span> <span class="o">&gt;</span> <span class="n">nLen2</span><span class="p">)</span> <span class="n">str2</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">nLen</span> <span class="o">-</span> <span class="n">nLen2</span><span class="p">,</span> <span class="sc">&#39;0&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>       <span class="kt">int</span> <span class="n">temp</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>   <span class="c1">//进位数目  </span>
-</span><span class='line'>       <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>       <span class="n">string</span> <span class="n">strResult</span><span class="p">;</span>    <span class="c1">//存储结果  </span>
-</span><span class='line'>
-</span><span class='line'>       <span class="k">while</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">nLen</span><span class="p">)</span>
-</span><span class='line'>       <span class="p">{</span>
-</span><span class='line'>           <span class="k">if</span><span class="p">(</span><span class="n">str1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span><span class="mh">0x30</span> <span class="o">+</span> <span class="n">str2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">temp</span> <span class="o">&gt;</span> <span class="sc">&#39;9&#39;</span><span class="p">)</span>
-</span><span class='line'>           <span class="p">{</span>
-</span><span class='line'>               <span class="n">strResult</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">str1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">str2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="sc">&#39;9&#39;</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">temp</span><span class="p">);</span>
-</span><span class='line'>               <span class="n">temp</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>           <span class="p">}</span>
-</span><span class='line'>           <span class="k">else</span>
-</span><span class='line'>           <span class="p">{</span>
-</span><span class='line'>               <span class="n">strResult</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">str1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">str2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="sc">&#39;0&#39;</span> <span class="o">+</span> <span class="n">temp</span><span class="p">);</span>
-</span><span class='line'>               <span class="n">temp</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>           <span class="p">}</span>
-</span><span class='line'>           <span class="n">i</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>       <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>       <span class="k">if</span><span class="p">(</span><span class="n">temp</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-</span><span class='line'>          <span class="n">strResult</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sc">&#39;1&#39;</span><span class="p">);</span>
-</span><span class='line'>       <span class="n">reverse</span><span class="p">(</span><span class="n">strResult</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">strResult</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
-</span><span class='line'>       <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">strResult</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>   <span class="p">}</span>
-</span><span class='line'>   <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-		
-		
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-08T17:19:00+08:00" pubdate data-updated="true">Nov 8<span>th</span>, 2012</time></div>
-	<div class="tags">
-
-</div>
-	
-</div>
-</article>
-
 <nav id="pagenavi">
     
     
@@ -1629,7 +1720,7 @@ perl 语言，正则表达式是个强大的工具，在处理文本时候特别
     
     <div class="center"><a href="/blog/archives">Blog Archives</a></div>
 </nav></div>
-	<footer id="footer" class="inner">Copyright &copy; 2013
+	<footer id="footer" class="inner">Copyright &copy; 2014
 
     tingxueren
 

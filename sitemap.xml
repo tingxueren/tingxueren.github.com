@@ -76,26 +76,30 @@
         <loc>
             http://tingxueren.github.io/blog/2013/07/02/install-goagent3-dot-0-in-ubuntu12-dot-04/
         </loc>
-        <lastmod>2013-07-02T19:15:15+08:00</lastmod>
+        <lastmod>2013-07-02T19:15:03+08:00</lastmod>
     </url>
     <url>
         <loc>http://tingxueren.github.io/blog/2013/10/22/zhao-gong-zuo-jie-shu-liao/</loc>
-        <lastmod>2013-10-22T20:00:52+08:00</lastmod>
+        <lastmod>2013-10-22T19:59:00+08:00</lastmod>
     </url>
     <url>
         <loc>http://tingxueren.github.io/blog/2013/10/22/bai-du-yun-wei-mian-shi-quan-ji-lu/</loc>
         <lastmod>2013-10-22T22:21:12+08:00</lastmod>
     </url>
     <url>
-        <loc>http://tingxueren.github.io/robots.txt</loc>
-        <lastmod>2013-07-02T18:30:55+08:00</lastmod>
-    </url>
-    <url>
-        <loc>http://tingxueren.github.io/blog/archives/</loc>
-        <lastmod>2013-10-22T22:21:12+08:00</lastmod>
+        <loc>http://tingxueren.github.io/blog/2014/01/01/zui-jin-zhe-teng-bi-ji/</loc>
+        <lastmod>2014-01-01T15:59:16+08:00</lastmod>
     </url>
     <url>
         <loc>http://tingxueren.github.io/</loc>
-        <lastmod>2013-10-22T22:21:12+08:00</lastmod>
+        <lastmod>2014-01-01T15:59:16+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://tingxueren.github.io/blog/archives/</loc>
+        <lastmod>2014-01-01T15:59:16+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://tingxueren.github.io/robots.txt</loc>
+        <lastmod>2013-03-26T17:29:02+08:00</lastmod>
     </url>
 </urlset>
