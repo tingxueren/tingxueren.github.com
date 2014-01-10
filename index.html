@@ -7,7 +7,7 @@
 	<meta name="author" content="tingxueren">
 
 	
-	<meta name="description" content="最近论文写完了，不安分的心总是静不下来，又开始了一轮新的折腾。最近忙活的事情乱七八糟的，主要有下面的几件事：安装Arch， 重新投奔Arch旗下；申请到了Windows Azure的试用帐号，尝试国内的云服务；加入了WCG计划，开挖ripple币，貌似挖了那么久还不够电费的。 安装Arch &hellip;">
+	<meta name="description" content="最近学校的网络超级的不爽，原来上下行都能达到几十M的网速被生生的限制为下行3M，上行0.3M不说而且屏蔽了很多网站，使用的手段相当的龌龊，直接在出口路由上将网站直接指向了127.0.0.1，十分的郁闷。我的迅雷会员算是废了，无法在线看视频了，WTF。 还好最近申请到了Windows &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -94,6 +94,217 @@
 
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2014/01/10/jian-yi-http-proxy-da-jian/">
+		
+			简易http Proxy搭建</a>
+	</h2>
+	<div class="entry-content">
+		<p>最近学校的网络超级的不爽，原来上下行都能达到几十M的网速被生生的限制为下行3M，上行0.3M不说而且屏蔽了很多网站，使用的手段相当的龌龊，直接在出口路由上将网站直接指向了127.0.0.1，十分的郁闷。我的迅雷会员算是废了，无法在线看视频了，WTF。</p>
+
+<p>还好最近申请到了Windows Azure的试用名额，除了开着Boinc做WCG任务获取点XRP就是在闲着，就想着用这服务器搭建个http proxy脱离学校的魔掌，使用正常的网络。但是普通的http proxy无法访问那些“不存在”的网站，因此需要该http proxy自动的处理正常网站和被封锁网站之间的关系。基本的思路是做个路由表使得正常的网站走国内网络，“不存在”网站走国外的代理。</p>
+
+<h2>基本需求</h2>
+
+<h3>硬件</h3>
+
+<p>国外vps一台（Digitalocean）</p>
+
+<p>国内vps一台（Windows Azure）</p>
+
+<p>上述两台服务器使用的都是ubuntu 12.04.3 LTS</p>
+
+<h3>软件</h3>
+
+<p><a href="http://shadowsocks.org/1.4/index.html">shadowsocks</a></p>
+
+<p><a href="https://www.torproject.org/projects/obfsproxy.html.en">obfsproxy</a></p>
+
+<p>privoxy</p>
+
+<p>squid3</p>
+
+<h2>步骤</h2>
+
+<h3>shadowsocks和obfsproxy</h3>
+
+<p>在国外vps上运行shadowsocks和obfsproxy，shadowsocks提供socks代理服务，obfsproxy负责将流量进行混淆，使得代理更加的安全，不使用obfsproxy也可以。这两个软件的安装配置都比较简单，在各自的官方网站上都有详细的介绍。这样国外的vps上的工作已经做完了，重点在于国内vps上的配置。</p>
+
+<p>国内vps上同样也要先安装shadowsocks和obfsproxy，不同的是国外安装的都是服务器版本，国内安装的都是客户端版本不要搞混淆了。配置好后国内的vps上就有了一个可以用的socks代理，通过这个代理可以访问自由世界的互联网，没有伟大的GFW的干扰了。但是很多的服务不支持socks代理，http代理支持的范围比较广泛，幸好socks代理转化为http代理还是比较容易的，使用privoxy就可以了。</p>
+
+<h3>安装privoxy</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo apt-get install privoxy</span></code></pre></td></tr></table></div></figure>
+
+
+<p>privoxy的配置比较简单，只需要指定socks代理的端口和转化出来的http代理的端口就好，配置文件为<code>/etc/pvivoxy/config</code>,下面是简单的例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># /etc/privoxy/config
+</span><span class='line'>
+</span><span class='line'>user-manual /usr/share/doc/privoxy/user-manual
+</span><span class='line'>confdir /etc/privoxy
+</span><span class='line'>logdir /var/log/privoxy
+</span><span class='line'>actionsfile match-all.action
+</span><span class='line'>actionsfile default.action
+</span><span class='line'>#actionsfile block.action
+</span><span class='line'>filterfile default.filter
+</span><span class='line'>#filterfile user.filter
+</span><span class='line'>logfile logfile
+</span><span class='line'>forward-socks5 / 127.0.0.1:1234 . #socks代理的端口1234
+</span><span class='line'>listen-address *:5678             #转化的http代理端口5678
+</span><span class='line'>toggle 1
+</span><span class='line'>enable-remote-toggle 1
+</span><span class='line'>enable-remote-http-toggle 0
+</span><span class='line'>enable-edit-actions 0
+</span><span class='line'>enforce-blocks 0
+</span><span class='line'>buffer-limit 5120
+</span><span class='line'>#connection-sharing 0
+</span><span class='line'>forwarded-connect-retries 3
+</span><span class='line'>accept-intercepted-requests 0
+</span><span class='line'>allow-cgi-request-crunching 0
+</span><span class='line'>activity-animation 1
+</span><span class='line'>split-large-forms 0
+</span><span class='line'>keep-alive-timeout 0
+</span><span class='line'>socket-timeout 120
+</span><span class='line'>handle-as-empty-doc-returns-ok 1</span></code></pre></td></tr></table></div></figure>
+
+
+<p>privoxy安装好后我们就有了一个http代理，这个代理可以自由的访问所有的网络，所有的请求都会转到国外的vps上执行然后将执行的结果回传，所有的流量都要在国外转一圈，这样访问国内的网站是很慢的，而且有些国内网站屏蔽了国内ip，这样的网络体验并不好。下一步骤就该squid大显身手的时候了，squid是一个代理和缓存服务器，可以指定规则使得不同的网络请求走不同的路径，还有缓存加速的功能，可以加速网络的访问，squid的安装比较简单。</p>
+
+<h3>安装squid</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo apt-get install squid</span></code></pre></td></tr></table></div></figure>
+
+
+<p>squid的配置文件位于<code>/etc/squid3/squid.conf</code>,下面是我使用的配置，稍后我会简单的介绍下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#代理服务器的监听端口
+</span><span class='line'>http_port 9999
+</span><span class='line'>
+</span><span class='line'>##########################
+</span><span class='line'> 
+</span><span class='line'>cache_peer localhost parent 5678 0 no-query
+</span><span class='line'># 默认走shadowsocks, 国内ip走国内
+</span><span class='line'>acl chinaip dst "/etc/squid3/chinaip"
+</span><span class='line'>always_direct allow chinaip
+</span><span class='line'>acl ALL src all
+</span><span class='line'>never_direct allow ALL
+</span><span class='line'>
+</span><span class='line'>##########################
+</span><span class='line'>
+</span><span class='line'>#内存缓冲区的大小
+</span><span class='line'>cache_mem 2048 MB
+</span><span class='line'>#设置硬盘缓冲区最大4096MB，16个一级目录，256个二级目录。
+</span><span class='line'>cache_dir ufs /var/spool/squid 4096 16 256
+</span><span class='line'>#设置访问日志文件
+</span><span class='line'>cache_access_log /var/log/squid3/access.log
+</span><span class='line'>#设置缓存日志文件
+</span><span class='line'>cache_log /var/log/squid3/cache.log
+</span><span class='line'>#设置网页缓存日志文件
+</span><span class='line'>cache_store_log /var/log/squid3/store.log
+</span><span class='line'>#定义允许名称为all的http请求。
+</span><span class='line'>http_access allow all</span></code></pre></td></tr></table></div></figure>
+
+
+<p>squid支持父代理，而且指定了父代理后默认的全部流量都从父代理走，由于GFW的威力日益强大，为了一劳永逸，配置中使用了比较暴力的手段，找出了所有的中国ip，将ip段放在<code>/etc/squid3/chinaip</code>这个文件中，使国内ip直连，国外ip都通过shadowsocks代理。虽然会使得有些未被墙掉的网站访问变慢，但是照着GFW这样疯狂的势头这个方案还是比较行得通的，不用蛋疼的手动添加被墙的网站了。</p>
+
+<p><code>/etc/squid3/chinaip</code>中的条目都是形如<code>192.168.1.0/24</code>或者<code>192.168.1.0/255.255.255.0</code>，每行一个网段，squid同时支持这两种网络的写法。获取国内的ip地址可以访问该<a href="https://code.google.com/p/chnroutes/">网站</a>,下载后的文件一般需要使用<code>sed、awd</code>等工具修改成满足squid需求的格式。这样就得到了一个全能的http proxy，国内国外网站随意遨游了。</p>
+
+<h2>参考资料</h2>
+
+<ol>
+<li><a href="http://bao3.blogspot.com/2012/01/apn-proxy-apn.html">简易 APN Proxy (APN代理）的搭建</a></li>
+<li><a href="https://www.fdb713.com/set-up-an-easy-apn-proxy/">简易apn代理搭建</a></li>
+<li><a href="https://sorz.org/squid-blacklist/">GFWList 兼容 Squid</a></li>
+<li><a href="http://home.arcor.de/pangj/squid/index.html">Squid中文权威指南</a></li>
+</ol>
+
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-01-10T15:10:00+08:00" pubdate data-updated="true">Jan 10<span>th</span>, 2014</time></div>
+	<div class="tags">
+
+</div>
+	
+</div>
+</article>
 
 
     <article class="post">
@@ -1335,377 +1546,6 @@ perl 语言，正则表达式是个强大的工具，在处理文本时候特别
 
 
 <time datetime="2012-11-29T20:26:00+08:00" pubdate data-updated="true">Nov 29<span>th</span>, 2012</time></div>
-	<div class="tags">
-
-</div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2012/11/24/linux-chang-yong-wang-luo-gong-ju/">
-		
-			Linux 常用网络工具</a>
-	</h2>
-	<div class="entry-content">
-		<p>既然享受了上网的便利，有时候就不得不忍受网络带来的痛苦。正上网看视频看的 high, 突然网页卡死了，刷新后网页都打不开，正聊 QQ 突然掉线了，想访问些国外网站发现输入域名后跳转到莫名其妙的网站，这时候你就要检查下自己的网络问题了。“工欲善其事，必先利其器”， Linux 下有很好用的网络工具，掌握了这些工具基本上就能找到网络出毛病的原因，自己动手修复了。</p>
-
-<h2>常用工具</h2>
-
-<p>常用的工具一般有：ping、ifconfig、traceroute、nslookup、dig、whois、iftop、ntop等，下面简要介绍下</p>
-
-<h3>ping</h3>
-
-<p>ping 很简单，也是最常用的工具，常常用来测试网络是否联通，用法：ping ip/host 即可，Windows 下也用同样的命令</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># 测试网络是否联通</span>
-</span><span class='line'><span class="nv">$ </span>ping  baidu.com
-</span><span class='line'><span class="c"># 有时候 ping 的返回会很慢，这是因为 ping 会尽量将 ip 转化为域名，如果对应 ip 没有设置域名</span>
-</span><span class='line'><span class="c"># 解析的话会直到超时才返回，可以添加 -n 参数，让 ping 立即得到返回数据</span>
-</span><span class='line'><span class="nv">$ </span>ping -n 8.8.8.8
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>ifconfig</h3>
-
-<p>ifconfig 是用来查看本机网络的各种接口的， Windows 下对应命令为 ipconfig</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># 本机执行 ifconig</span>
-</span><span class='line'><span class="nv">$ </span>ifconfig
-</span><span class='line'>eth0      Link encap:Ethernet  HWaddr 8c:89:a5:39:**:**
-</span><span class='line'>          inet addr:192.168.1.100  Bcast:192.168.1.255  Mask:255.255.255.0
-</span><span class='line'>          inet6 addr: fe80::8e89:a5ff:fe39:5c96/64 Scope:Link
-</span><span class='line'>          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
-</span><span class='line'>          RX packets:3591303 errors:0 dropped:10 overruns:0 frame:0
-</span><span class='line'>          TX packets:3219419 errors:0 dropped:0 overruns:0 carrier:0
-</span><span class='line'>          collisions:0 txqueuelen:1000
-</span><span class='line'>          RX bytes:3257148705 <span class="o">(</span>3.2 GB<span class="o">)</span>  TX bytes:448474566 <span class="o">(</span>448.4 MB<span class="o">)</span>
-</span><span class='line'>          Interrupt:43 Base address:0xe000
-</span><span class='line'>
-</span><span class='line'>lo        Link encap:Local Loopback
-</span><span class='line'>          inet addr:127.0.0.1  Mask:255.0.0.0
-</span><span class='line'>          inet6 addr: ::1/128 Scope:Host
-</span><span class='line'>          UP LOOPBACK RUNNING  MTU:16436  Metric:1
-</span><span class='line'>          RX packets:321987 errors:0 dropped:0 overruns:0 frame:0
-</span><span class='line'>          TX packets:321987 errors:0 dropped:0 overruns:0 carrier:0
-</span><span class='line'>          collisions:0 txqueuelen:0
-</span><span class='line'>          RX bytes:75444551 <span class="o">(</span>75.4 MB<span class="o">)</span>  TX bytes:75444551 <span class="o">(</span>75.4 MB<span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># MAC地址我做了注释，可以看到本机只用一个网卡 eth0，lo 为本地环回接口</span>
-</span><span class='line'><span class="c"># 本机 ip 为 192.168.1.100, 为一个私有地址，因为我的电脑是接在路由器下面的</span>
-</span><span class='line'><span class="c"># 其他参数可以 man ifconfig</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>traceroute</h3>
-
-<p>traceroute 是个路由跟踪命令，可以跟踪从本机到目标 ip 的具体路由过程，Windows 下对应的命令是 tracert</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># 本机跟踪到 baidu.com 的路由过程</span>
-</span><span class='line'><span class="nv">$ </span>traceroute baidu.com
-</span><span class='line'>traceroute to baidu.com <span class="o">(</span>123.125.114.144<span class="o">)</span>, 30 hops max, 60 byte packets
-</span><span class='line'> 1  192.168.1.1 <span class="o">(</span>192.168.1.1<span class="o">)</span>  0.485 ms  1.117 ms  1.313 ms
-</span><span class='line'> 2  192.168.149.254 <span class="o">(</span>192.168.149.254<span class="o">)</span>  4.472 ms  4.754 ms  4.785 ms
-</span><span class='line'> *
-</span><span class='line'> *
-</span><span class='line'> 9  219.158.14.97 <span class="o">(</span>219.158.14.97<span class="o">)</span>  43.474 ms  43.522 ms  43.695 ms
-</span><span class='line'>10  123.126.0.66 <span class="o">(</span>123.126.0.66<span class="o">)</span>  47.145 ms  47.186 ms  47.248 ms
-</span><span class='line'>11  61.148.3.34 <span class="o">(</span>61.148.3.34<span class="o">)</span>  49.409 ms  49.523 ms  49.417 ms
-</span><span class='line'>12  202.106.43.66 <span class="o">(</span>202.106.43.66<span class="o">)</span>  39.283 ms 202.106.43.174 <span class="o">(</span>202.106.43.174<span class="o">)</span>  40.238 ms  40.661 ms
-</span><span class='line'>29  * * *
-</span><span class='line'>30  * * *
-</span><span class='line'>
-</span><span class='line'><span class="c"># 为了保密删除了开头的几条路径</span>
-</span><span class='line'><span class="c"># 有些路由禁止探测，比如第29, 30 跳</span>
-</span><span class='line'><span class="c"># 最多跳数为 30, 到了30 跳虽然还没有到 baidu.com 但是命令结束了</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>nslookup</h3>
-
-<p>nslookup 是用来查询 DNS 解析的，通过这个命令可以明显的看到 GFW 的常用手段 “DNS污染”。Windows 下的命令相同</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># 执行 nslookup 用国内 DNS 服务器</span>
-</span><span class='line'><span class="c"># 命令格式: nslookup 域名 DNS服务器</span>
-</span><span class='line'><span class="c"># 查询 twitter.com 通过国内DNS服务器</span>
-</span><span class='line'><span class="nv">$ </span>nslookup twitter.com  221.12.1.227
-</span><span class='line'>Server:       221.12.1.227
-</span><span class='line'>Address:  221.12.1.227#53
-</span><span class='line'>
-</span><span class='line'>Non-authoritative answer:
-</span><span class='line'>Name: twitter.com
-</span><span class='line'>Address: 59.24.3.173
-</span><span class='line'><span class="c"># 通过 whois 查询可知 59.24.3.173 是个韩国ip</span>
-</span><span class='line'><span class="c"># 挂上 vpn 通过 google dns 查询得到正确ip</span>
-</span><span class='line'><span class="nv">$ </span>nslookup twitter.com  8.8.8.8
-</span><span class='line'>Server:       8.8.8.8
-</span><span class='line'>Address:  8.8.8.8#53
-</span><span class='line'>
-</span><span class='line'>Non-authoritative answer:
-</span><span class='line'>Name: twitter.com
-</span><span class='line'>Address: 199.59.150.39
-</span><span class='line'>Name: twitter.com
-</span><span class='line'>Address: 199.59.149.230
-</span><span class='line'>Name: twitter.com
-</span><span class='line'>Address: 199.59.148.10
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>dig</h3>
-
-<p>dig 命令和 nslookup 十分相似，也是用来进行 DNS查询的，命令格式也很简单 <code>dig @server host</code> 即可。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># 我把我的另一个域名 tingxueren.info 指向了 tingxueren.github.com 在 github 上面维护了自己的blog，可以用</span>
-</span><span class='line'><span class="c"># dig 查询下，会发现 ip 一致</span>
-</span><span class='line'><span class="c"># dig tingxueren.info</span>
-</span><span class='line'><span class="nv">$ </span>dig @8.8.8.8 tingxueren.info
-</span><span class='line'>
-</span><span class='line'>; &lt;&lt;&gt;&gt; DiG 9.8.1-P1 &lt;&lt;&gt;&gt; @8.8.8.8 tingxueren.info
-</span><span class='line'>; <span class="o">(</span>1 server found<span class="o">)</span>
-</span><span class='line'>;; global options: +cmd
-</span><span class='line'>;; Got answer:
-</span><span class='line'>;; -&gt;&gt;HEADER<span class="s">&lt;&lt;- opcode: QUERY, status: NOERROR, id: 16481</span>
-</span><span class='line'><span class="s">;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0</span>
-</span><span class='line'>
-</span><span class='line'><span class="s">;; QUESTION SECTION:</span>
-</span><span class='line'><span class="s">;tingxueren.info.     IN  A</span>
-</span><span class='line'>
-</span><span class='line'><span class="s">;; ANSWER SECTION:</span>
-</span><span class='line'><span class="s">tingxueren.info.  1800    IN  A   204.232.175.78</span>
-</span><span class='line'>
-</span><span class='line'><span class="s">;; Query time: 368 msec</span>
-</span><span class='line'><span class="s">;; SERVER: 8.8.8.8#53(8.8.8.8)</span>
-</span><span class='line'><span class="s">;; WHEN: Sat Nov 24 19:23:45 2012</span>
-</span><span class='line'><span class="s">;; MSG SIZE  rcvd: 49</span>
-</span><span class='line'><span class="s"># dig tingxueren.github.com</span>
-</span><span class='line'><span class="s">dig @8.8.8.8 tingxueren.github.com</span>
-</span><span class='line'>
-</span><span class='line'><span class="s">; &lt;&lt;&gt;&gt; DiG 9.8.1-P1 &lt;&lt;&gt;&gt; @8.8.8.8 tingxueren.github.com</span>
-</span><span class='line'><span class="s">; (1 server found)</span>
-</span><span class='line'><span class="s">;; global options: +cmd</span>
-</span><span class='line'><span class="s">;; Got answer:</span>
-</span><span class='line'><span class="s">;; -&gt;&gt;HEADER&lt;&lt;- opcode</span>: QUERY, status: NOERROR, id: 51234
-</span><span class='line'>;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
-</span><span class='line'>
-</span><span class='line'>;; QUESTION SECTION:
-</span><span class='line'>;tingxueren.github.com.       IN  A
-</span><span class='line'>
-</span><span class='line'>;; ANSWER SECTION:
-</span><span class='line'>tingxueren.github.com.    43200   IN  A   204.232.175.78
-</span><span class='line'>
-</span><span class='line'>;; Query <span class="nb">time</span>: 180 msec
-</span><span class='line'>;; SERVER: 8.8.8.8#53<span class="o">(</span>8.8.8.8<span class="o">)</span>
-</span><span class='line'>;; WHEN: Sat Nov 24 19:26:58 2012
-</span><span class='line'>;; MSG SIZE  rcvd: 55
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>whois</h3>
-
-<p><a href="http://zh.wikipedia.org/zh-cn/WHOIS">WHOIS</a>（读作“Who is”，而非缩写）是用来查询互联网中域名的IP以及所有者等信息的传输协议。上面才查找 twitter 的错误 ip 的时候已经用过了，现在把刚才信息贴出来。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>whois 59.24.3.173
-</span><span class='line'><span class="c"># 韩文显示不正常，省略</span>
-</span><span class='line'><span class="c"># ENGLISH</span>
-</span><span class='line'>
-</span><span class='line'>KRNIC is not an ISP but a National Internet Registry similar to APNIC.
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span> Network Information <span class="o">]</span>
-</span><span class='line'>IPv4 Address       : 59.0.0.0 - 59.31.255.255 <span class="o">(</span>/11<span class="o">)</span>
-</span><span class='line'>Service Name       : KORNET
-</span><span class='line'>Organization Name  : Korea Telecom
-</span><span class='line'>Organization ID    : ORG1600
-</span><span class='line'>Address            : 206, Jungja-dong, Bundang-gu, Sungnam-ci
-</span><span class='line'>Zip Code           : 463-711
-</span><span class='line'>Registration Date  : 20040831
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span> Admin Contact Information <span class="o">]</span>
-</span><span class='line'>Name               : IP Administrator
-</span><span class='line'>Phone              : +82-2-500-6630
-</span><span class='line'>E-Mail             : kornet_ip@kt.com
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span> Tech Contact Information <span class="o">]</span>
-</span><span class='line'>Name               : IP Manager
-</span><span class='line'>Phone              : +82-2-500-6630
-</span><span class='line'>E-Mail             : kornet_ip@kt.com
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span> Network Abuse Contact Information <span class="o">]</span>
-</span><span class='line'>Name               : Network Abuse
-</span><span class='line'>Phone              : +82-2-100-0000
-</span><span class='line'>E-Mail             : abuse@kornet.net
-</span><span class='line'><span class="c"># GFW 常常会把 “非法网站” 进行 DNS 投毒，解析到韩国的 ip，韩国是躺着也中枪</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>iftop 和 ntop</h3>
-
-<p>这两个工具是用来做流量监控的，iftop 比较简陋，提供的是字符界面，ntop 安装后可以在本机浏览器打开 3000 端口会有图形界面的，内容相当的详细。对这两个工具了解的不多，只是刚开始用，可以看下下面这两个帖子。
-1. <a href="http://www.vpser.net/manage/iftop.html">Linux流量监控工具 &ndash; iftop (最全面的iftop教程)</a>
-2. <a href="http://netslyz.blog.51cto.com/1006247/407510/">在RHEL5下使用NTOP监测网络流量</a></p>
-
-		
-		
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-24T18:22:00+08:00" pubdate data-updated="true">Nov 24<span>th</span>, 2012</time></div>
 	<div class="tags">
 
 </div>
